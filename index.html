@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Zeca e a Aventura dos Números</title>
+<meta name="theme-color" content="#26b562">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Zeca">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--ink:#243b53;--paper:#fffef7;--grid:#c6dcf3;--blue:#2f80ed;--green:#1fb866;--orange:#ff9f1c;--red:#e5484d;--purple:#7c5cff;--yellow:#ffd23f;--cw:56px;--ch:62px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{font-family:"Chalkboard SE","Comic Neue","Comic Sans MS","Segoe Print",system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#7fe0a6 0%,#43c97d 45%,#26b562 100%) fixed;user-select:none;-webkit-user-select:none;touch-action:manipulation;overflow-x:hidden}
+button{font:inherit;cursor:pointer;border:0;border-radius:18px;padding:10px 18px;min-height:52px;color:#fff;background:var(--blue);box-shadow:0 5px 0 rgba(0,0,0,.18);transition:transform .08s}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+button.g{background:var(--green)}button.o{background:var(--orange)}button.p{background:var(--purple)}button.r{background:var(--red)}button.y{background:var(--yellow);color:var(--ink)}button.w{background:#fff;color:var(--ink)}
+button[disabled]{opacity:.45;pointer-events:none}
+h1,h2,h3{margin:.3em 0}
+#top{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);position:sticky;top:0;z-index:20;flex-wrap:wrap;border-bottom:6px solid #ffdf00;box-shadow:0 6px 0 #1b56c7}
+#top button{min-height:44px;padding:4px 12px}
+.chip{background:#fff;border-radius:999px;padding:6px 12px;font-weight:700;box-shadow:inset 0 0 0 2px #e3eefb;white-space:nowrap}
+.xpbar{display:inline-block;width:60px;height:8px;background:#e3eefb;border-radius:6px;vertical-align:middle;margin-left:6px;overflow:hidden}.xpbar i{display:block;height:100%;background:var(--green);width:0}
+.spacer{flex:1}
+#stage{padding:14px;max-width:1100px;margin:0 auto}
+.card{background:#fff;border-radius:24px;padding:16px 18px;box-shadow:0 6px 0 rgba(36,59,83,.1)}
+.mascot{display:inline-block;position:relative;font-size:76px;line-height:1;animation:bob 2.4s ease-in-out infinite}
+.mascot .acc{position:absolute;top:-26px;left:50%;transform:translateX(-50%);font-size:44px}
+.mascot.sm{font-size:48px}.mascot.sm .acc{font-size:28px;top:-16px}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.hero{display:flex;gap:18px;align-items:center;margin:20px 0 10px}
+.hero p{margin:0;font-size:20px}
+.mission{background:linear-gradient(135deg,#7c5cff,#2f80ed);color:#fff;border-radius:26px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 7px 0 rgba(36,59,83,.2)}
+.mission h2{margin:0}.mission p{margin:4px 0 0;opacity:.95}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px;margin-top:16px}
+.tile{background:#fff;border-radius:24px;padding:18px;text-align:center;cursor:pointer;box-shadow:0 6px 0 rgba(36,59,83,.12);transition:transform .1s;border:0;color:var(--ink);font-size:20px;min-height:140px}
+.tile:active{transform:translateY(3px)}.tile .e{font-size:48px;display:block}.tile small{display:block;font-size:14px;opacity:.75;margin-top:4px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px}
+.lv{background:#fff;border-radius:24px;padding:16px;text-align:center;box-shadow:0 6px 0 rgba(36,59,83,.12)}
+.lv.locked{filter:grayscale(1);opacity:.6}.lv .n{font-size:40px;font-weight:700}.lv .med{font-size:34px;min-height:42px}
+/* notebook */
+.nbgrid{display:grid;grid-template-columns:1fr 330px;gap:14px;align-items:start}
+@media(max-width:860px){.nbgrid{grid-template-columns:1fr}:root{--cw:46px;--ch:54px}}
+.paper{background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;border-radius:14px;box-shadow:0 6px 0 rgba(36,59,83,.15);position:relative;padding:14px 18px 18px 62px;min-height:420px}
+.paper::before{content:"";position:absolute;left:44px;top:0;bottom:0;width:3px;background:#f4a3a8}
+.paper::after{content:"";position:absolute;left:10px;top:18px;bottom:18px;width:14px;background:radial-gradient(circle,#9db4cf 5px,transparent 6px) 0 0/14px 40px repeat-y}
+.ptitle{font-size:16px;opacity:.7;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.prob{font-size:30px;font-weight:700;margin:4px 0 10px;color:var(--purple)}
+.vwrap{display:inline-block;margin:6px 0}.dwrap{display:flex;align-items:flex-start;margin:6px 0}
+.vrow{display:flex}
+.vrow.sep{height:5px;background:var(--ink);border-radius:3px;margin:4px 0 4px var(--cw)}.vrow.sep .cell{display:none}
+.vrow.carry .cell{height:34px}
+.cell{width:var(--cw);height:var(--ch);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;border-radius:10px}
+.cell.blank{visibility:hidden}
+.cell.in,.cell.hid{background:#fff;border:3px dashed #9db4cf}
+.cell.hid{border-color:transparent;background:transparent}
+.cell.hid.cur{border:3px dashed var(--orange);background:#fff}
+.cell.act{border-color:#6fa8f5}
+.cell.cur{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,128,237,.28);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(47,128,237,.12)}}
+.cell.ok{color:var(--green);border:3px solid #bfe8d0;background:#f1fff7}
+.cell.hid.ok{border-color:transparent;background:transparent;color:var(--ink)}
+.cell.assist{color:var(--purple);border:3px solid #d9ccff;background:#f7f3ff}
+.cell.bad{border-color:var(--red)!important;color:var(--red)}
+.cell.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.cell.sm{height:34px;font-size:22px;color:var(--orange)}
+.cell.strike{text-decoration:line-through;text-decoration-thickness:4px;text-decoration-color:var(--red);color:#9aa9bd}
+.cell.ph{color:#9aa9bd}.cell.sign{font-size:34px;color:var(--purple)}
+.cell.chave{border-right:4px solid var(--ink);border-radius:0}
+.dright{margin-left:0}.dv{border-bottom:4px solid var(--ink);padding-left:12px;height:var(--ch);display:flex;align-items:center}
+.dv .cell{width:auto;padding:0 6px;color:var(--ink)}
+.qrow{display:flex;padding-left:12px;margin-top:4px}
+.side{display:flex;flex-direction:column;gap:12px}
+.coach{display:flex;gap:10px;align-items:flex-start}
+.bubble{background:#fff;border-radius:20px;padding:12px 14px;font-size:19px;line-height:1.35;position:relative;box-shadow:0 4px 0 rgba(36,59,83,.1);flex:1;min-height:70px}
+.fb{min-height:26px;color:var(--green);font-weight:700;font-size:17px;margin-top:4px}
+#pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+#pad button{font-size:30px;min-height:64px;padding:0}
+.dots{display:flex;gap:6px;flex-wrap:wrap}.dot{width:16px;height:16px;border-radius:50%;background:#d6e3f2}.dot.d{background:var(--green)}.dot.c{background:var(--blue);box-shadow:0 0 0 3px rgba(47,128,237,.3)}
+/* overlay */
+#overlay{position:fixed;inset:0;background:rgba(20,30,60,.55);display:flex;align-items:center;justify-content:center;z-index:50;padding:12px}
+#overlay[hidden]{display:none}
+.modal{background:#fff;border-radius:28px;padding:22px 26px;max-width:640px;width:100%;max-height:92vh;overflow:auto;text-align:center;animation:popin .25s}
+@keyframes popin{from{transform:scale(.85);opacity:0}}
+.modal .big{font-size:48px;letter-spacing:4px}.modal p{font-size:19px;line-height:1.4}.modal .ex{font-size:20px;text-align:left;line-height:1.5;background:#f4f9ff;border-radius:16px;padding:12px 16px;margin:10px 0}
+.modal button{margin:8px 6px 0}
+.vis{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0}.bag{border:3px solid #6fa8f5;border-radius:14px;padding:6px;display:flex;flex-wrap:wrap;gap:3px;max-width:130px;justify-content:center;background:#f4f9ff}.bag.rest{border-style:dashed;border-color:var(--orange)}.bag i{width:14px;height:14px;border-radius:50%;background:var(--blue);display:block}.bag.rest i{background:var(--orange)}
+.arr{display:grid;gap:4px;justify-content:center}.arr i{width:20px;height:20px;border-radius:50%;background:var(--blue);display:block}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:99;overflow:hidden}.confetti span{position:absolute;top:-40px;animation:fall 2.4s ease-in forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+#toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+#toast div{background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;animation:popin .25s;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+/* facts */
+.fcard{background:#fff;border-radius:28px;padding:20px;text-align:center;box-shadow:0 6px 0 rgba(36,59,83,.12)}
+.fq{font-size:68px;font-weight:700;color:var(--purple)}.fa{font-size:60px;font-weight:700;min-height:76px;border-bottom:5px dashed #9db4cf;display:inline-block;min-width:180px;color:var(--ink)}
+.tbar{height:14px;background:#e3eefb;border-radius:8px;overflow:hidden;margin:10px auto;max-width:520px}.tbar i{display:block;height:100%;background:var(--green);width:100%}
+.fgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}@media(max-width:700px){.fgrid{grid-template-columns:1fr}}
+.map{display:grid;grid-template-columns:repeat(11,1fr);gap:3px;font-size:13px;text-align:center}.map b{background:#eef4fb;border-radius:6px;padding:4px 0}.map span{border-radius:6px;padding:5px 0;color:#fff;font-weight:700}
+.chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0}.chips button{min-height:46px;min-width:46px;padding:4px 10px;background:#fff;color:var(--ink);box-shadow:inset 0 0 0 3px #cfe0f3}.chips button.on{background:var(--purple);color:#fff;box-shadow:none}
+/* balloons */
+.bfield{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:30px 0}
+.balloon{width:110px;height:136px;border-radius:50% 50% 48% 48%;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:700;color:#fff;cursor:pointer;position:relative;animation:float 2.2s ease-in-out infinite;box-shadow:inset -10px -10px 0 rgba(0,0,0,.12);border:0}
+.balloon::after{content:"";position:absolute;bottom:-26px;left:50%;width:2px;height:28px;background:#8895a7}
+.balloon.pop{animation:pop .3s forwards}.balloon.wob{animation:shake .4s}
+@keyframes float{50%{transform:translateY(-14px)}}@keyframes pop{to{transform:scale(1.6);opacity:0}}
+/* exam */
+.qcard{background:#fff;border-radius:24px;padding:18px;box-shadow:0 6px 0 rgba(36,59,83,.12)}
+.qtext{font-size:28px;font-weight:700;margin-bottom:10px}
+.fld{display:inline-flex;flex-direction:column;align-items:center;margin:6px 10px;font-size:15px}.fld div{min-width:130px;height:68px;border:4px dashed #9db4cf;border-radius:14px;font-size:40px;font-weight:700;display:flex;align-items:center;justify-content:center;background:#fff}.fld.cur div{border-color:var(--blue);box-shadow:0 0 0 4px rgba(47,128,237,.25)}
+canvas.scratch{width:100%;height:150px;background:#fffef7;border-radius:14px;box-shadow:inset 0 0 0 3px #cfe0f3;touch-action:none}
+.rv{display:flex;gap:10px;align-items:flex-start;text-align:left;padding:8px 10px;border-radius:14px;margin:6px 0}.rv.ok{background:#effcf4}.rv.no{background:#fff6e8}
+.small{font-size:15px;opacity:.8}
+
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;min-height:260px}.pcol{width:min(30%,170px);text-align:center}.pcol.me .pbar{outline:4px solid var(--purple)}.pname{font-weight:700;font-size:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pval{font-size:18px;margin-bottom:4px}.pbar{border-radius:16px 16px 0 0;display:flex;align-items:flex-start;justify-content:center;font-size:44px;padding-top:8px}
+table.st{border-collapse:collapse;width:100%;font-size:16px}table.st td,table.st th{padding:6px 8px;border-bottom:1px solid #e3eefb;text-align:left}
+</style>
+</head>
+<body>
+<header id="top">
+  <button class="w" id="btnHome" title="Início">🏠</button>
+  <div class="chip">⭐ <b id="hStars">0</b></div>
+  <div class="chip">🪙 <b id="hCoins">0</b></div>
+  <div class="chip">Nv <b id="hLvl">1</b><span class="xpbar"><i id="hXp"></i></span></div>
+  <div class="chip" id="hCombo" style="display:none">🔥 ×<b>0</b></div>
+  <div class="spacer"></div>
+  <div class="chip" id="hTime">⏱ 00:00</div>
+  <button class="w" id="btnSound" title="Sons">🔊</button>
+  <button class="w" id="btnVoice" title="Voz">🗣️</button>
+</header>
+<main id="stage"></main>
+<div id="overlay" hidden></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ============ utilidades ============ */
+const $=s=>document.querySelector(s);
+const range=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const digs=n=>String(n).split('').map(Number);
+const fmtT=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function h(tag,props,...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(props||{})){if(k==='class')e.className=v;else if(k==='html')e.innerHTML=v;else if(k.startsWith('on'))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v);}for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c));}return e;}
+const stage=$('#stage');
+let running=false;
+
+/* ============ estado e armazenamento (somente neste aparelho) ============ */
+const IDX='zeca-math-idx',PK='zeca-math-parent';
+const keyOf=id=>id==='p1'?'zeca-math-v1':'zeca-math-v1-'+id;
+function rd(k){try{const r=localStorage.getItem(k);return r?JSON.parse(r):null;}catch(e){return null;}}
+function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+let IX=rd(IDX)||{active:'p1',ids:['p1']};
+const KEY=keyOf(IX.active);let NOSAVE=false;
+const mkLv=()=>range(0,3).map(()=>({done:false,best:0,tries:0}));
+function defaults(){return{id:IX.active,name:'',stars:0,coins:0,spent:0,xp:0,owned:[],equip:'',sound:true,voice:false,lvl:{mult:mkLv(),div:mkLv(),add:mkLv(),sub:mkLv()},facts:{},stats:{},errKinds:{},ms:0,t:{ex:0,combo:0,balloons:0,exams:0,bestExam:0,missions:0},trophies:[],exams:[],sessions:[]};}
+let S=Object.assign(defaults(),rd(KEY)||{});
+S.lvl.add=S.lvl.add||mkLv();S.lvl.sub=S.lvl.sub||mkLv();
+const SES={t:Date.now(),ok:0,err:0,c0:S.coins+S.spent,s0:S.stars};
+function save(){if(NOSAVE)return;try{if(sessionSec>=5||SES.ok+SES.err>0){const e={t:SES.t,sec:sessionSec,ok:SES.ok,err:SES.err,coins:S.coins+S.spent-SES.c0,stars:S.stars-SES.s0};const a=S.sessions;if(a.length&&a[a.length-1].t===SES.t)a[a.length-1]=e;else a.push(e);if(a.length>30)a.splice(0,a.length-30);}localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)save();});window.addEventListener('pagehide',save);
+let combo=0,sessionSec=0;
+
+/* ============ som e voz ============ */
+let AC;function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return AC;}
+function tone(f,d=.12,type='sine',v=.15,when=0){if(!S.sound)return;const a=ac();if(!a)return;try{const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,a.currentTime+when);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+when+d);o.connect(g);g.connect(a.destination);o.start(a.currentTime+when);o.stop(a.currentTime+when+d);}catch(e){}}
+const SFX={ok(){tone(660,.1);tone(880,.15,'sine',.15,.09)},oops(){tone(300,.18,'triangle',.12);tone(260,.2,'triangle',.1,.12)},tap(){tone(500,.04,'square',.03)},win(){[523,659,784,1047].forEach((f,i)=>tone(f,.22,'sine',.15,i*.12))},pop(){tone(900,.08,'square',.07);tone(450,.1,'square',.05,.05)}};
+const cleanTxt=t=>String(t).replace(/<br\s*\/?>/gi,'. ').replace(/<[^>]+>/g,'').replace(/×/g,' vezes ').replace(/÷/g,' dividido por ').replace(/−/g,' menos ').replace(/\+/g,' mais ').replace(/=/g,' é igual a ').replace(/→/g,', ').replace(/[“”"]/g,'').replace(/\s+/g,' ');
+const ptVoices=()=>{try{return speechSynthesis.getVoices().filter(v=>/^pt[-_]BR$/i.test(v.lang));}catch(e){return[];}};
+function voiceScore(v){const n=v.name.toLowerCase();let sc=0;if(/natural|neural|online|aprimorad|enhanced|premium|siri/.test(n))sc+=6;if(/google/.test(n))sc+=3;if(/francisca|luciana|maria|vit[oó]ria|thalita|camila|fernanda|joana|giovanna/.test(n))sc+=2;if(/daniel|felipe|antonio|ant[oô]nio|ricardo|jorge/.test(n))sc-=2;return sc;}
+function pickVoice(){const L=ptVoices();if(!L.length)return null;if(S.voiceName){const f=L.find(v=>v.name===S.voiceName);if(f)return f;}return L.slice().sort((x,y)=>voiceScore(y)-voiceScore(x))[0];}
+let warnedVoice=false;
+function speak(t,kid){if(!('speechSynthesis' in window))return false;const v=pickVoice();
+  if(!v){if(!warnedVoice){warnedVoice=true;toast('Este aparelho não tem voz em português do Brasil: a explicação aparece só escrita.');}return false;}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(cleanTxt(t));u.voice=v;u.lang=v.lang;u.pitch=kid?1.12:1;u.rate=kid?.88:.95;u.volume=1;speechSynthesis.speak(u);return true;}catch(e){return false;}}
+function say(t){if(S.voice)speak(t,false);}
+function sayKid(t){if(S.sound)speak(t,true);}
+const replayBtn=t=>h('button',{class:'o',onclick:()=>sayKid(t)},'🔊 Ouvir o Zeca de novo');
+function factSpeech(f,r){const op=f.op,p=valF(f),sp=op?`${f.a} ${op==='+'?'mais':'menos'} ${f.b} é ${p}.`:`${f.a} vezes ${f.b} é ${p}.`;const help=op==='+'?addHelp(f.a,f.b):op==='-'?subHelp(f.a,f.b):factHelp(f.a,f.b);return(r.timeout?'O tempo acabou, mas tudo bem. Vamos aprender juntos. ':'Quase! Vamos aprender juntos. ')+sp+' '+help+' Repita comigo: '+sp;}
+function confetti(n=40){const box=h('div',{class:'confetti'});document.body.append(box);const em=['🎉','⭐','✨','🎊','💫','🌟'];for(let i=0;i<n;i++)box.append(h('span',{style:`left:${Math.random()*100}vw;animation-delay:${Math.random()*.7}s;font-size:${18+Math.random()*22}px`},em[i%em.length]));setTimeout(()=>box.remove(),3400);}
+function toast(t){const box=$('#toast');const d=h('div',{},t);box.append(d);setTimeout(()=>d.remove(),3000);}
+
+/* ============ cabeçalho ============ */
+const lvlOf=xp=>1+Math.floor(xp/100);
+function updHeader(){$('#hStars').textContent=S.stars;$('#hCoins').textContent=S.coins;$('#hLvl').textContent=lvlOf(S.xp);$('#hXp').style.width=(S.xp%100)+'%';const c=$('#hCombo');c.style.display=combo>=2?'':'none';c.querySelector('b').textContent=combo;$('#btnSound').textContent=S.sound?'🔊':'🔇';$('#btnVoice').style.opacity=S.voice?1:.45;}
+function addXp(n){const before=lvlOf(S.xp);S.xp+=n;if(lvlOf(S.xp)>before){confetti(30);SFX.win();toast(`🎉 O Zeca subiu para o nível ${lvlOf(S.xp)}!`);}updHeader();}
+setInterval(()=>{if(document.hidden)return;sessionSec++;S.ms+=1000;$('#hTime').textContent='⏱ '+fmtT(sessionSec);if(sessionSec%10===0)save();},1000);
+$('#btnSound').onclick=()=>{S.sound=!S.sound;save();updHeader();};
+$('#btnVoice').onclick=()=>{S.voice=!S.voice;save();updHeader();if(S.voice)say('Olá! Eu vou ler as perguntas para você.');};
+$('#btnHome').onclick=async()=>{if(!running){screenHome();return;}const ok=await confirmModal('Voltar ao início? O progresso já ganho fica guardado. ');if(ok){save();location.reload();}};
+
+/* ============ modais ============ */
+function modal(nodes,btn='Entendi!',cls=''){return new Promise(res=>{const o=$('#overlay');o.hidden=false;o.replaceChildren(h('div',{class:'modal '+cls},nodes,btn?h('button',{class:'g',onclick:()=>{try{speechSynthesis.cancel();}catch(e){}o.hidden=true;o.replaceChildren();res();}},btn):null));});}
+function confirmModal(text,yes='Voltar ao início',no='Continuar jogando'){return new Promise(res=>{const o=$('#overlay');o.hidden=false;const close=v=>{o.hidden=true;o.replaceChildren();res(v);};o.replaceChildren(h('div',{class:'modal'},h('p',{},text),h('button',{class:'g',onclick:()=>close(false)},no),h('button',{class:'w',onclick:()=>close(true)},yes)));});}
+
+/* ============ mascote e loja ============ */
+const SHOP=[{id:'cap',e:'🧢',n:'Boné',c:30},{id:'bow',e:'🎀',n:'Laço',c:35},{id:'glass',e:'🕶️',n:'Óculos escuros',c:50},{id:'hat',e:'🎩',n:'Cartola',c:70},{id:'wiz',e:'🪄',n:'Varinha mágica',c:90},{id:'crown',e:'👑',n:'Coroa',c:150}];
+const mascot=(cls='')=>h('span',{class:'mascot '+cls},S.equip?h('span',{class:'acc'},(SHOP.find(s=>s.id===S.equip)||{}).e):null,'🦊');
+const TROPHIES=[
+ {id:'first',e:'🌱',n:'Primeiro passo',d:'Termine 1 exercício no caderno',ok:()=>S.t.ex>=1},
+ {id:'ex10',e:'📒',n:'Caderno cheio',d:'Termine 10 exercícios',ok:()=>S.t.ex>=10},
+ {id:'combo10',e:'🔥',n:'Sequência de fogo',d:'10 acertos seguidos',ok:()=>S.t.combo>=10},
+ {id:'m1',e:'✖️',n:'Multiplicador',d:'Conclua o nível 1 de multiplicação',ok:()=>S.lvl.mult[0].done},
+ {id:'d1',e:'➗',n:'Divisor',d:'Conclua o nível 1 de divisão',ok:()=>S.lvl.div[0].done},
+ {id:'m4',e:'🏅',n:'Mestre da multiplicação',d:'Conclua o nível 4 de multiplicação',ok:()=>S.lvl.mult[3].done},
+ {id:'d4',e:'🥇',n:'Mestre da divisão',d:'Conclua o nível 4 de divisão',ok:()=>S.lvl.div[3].done},
+ {id:'tab5',e:'🧠',n:'Memória de elefante',d:'Domine 5 tabuadas',ok:()=>masteredTables()>=5},
+ {id:'tab10',e:'🐘',n:'Tabuada completa',d:'Domine as 10 tabuadas',ok:()=>masteredTables()>=10},
+ {id:'ball',e:'🎈',n:'Estourador',d:'Estoure 20 balões',ok:()=>S.t.balloons>=20},
+ {id:'exam',e:'📝',n:'Aluno aplicado',d:'Faça um simulado',ok:()=>S.t.exams>=1},
+ {id:'exam9',e:'🎓',n:'Nota 9 ou mais',d:'Tire 9 ou mais em um simulado',ok:()=>S.t.bestExam>=9},
+ {id:'a1',e:'➕',n:'Somador',d:'Conclua o nível 1 de adição',ok:()=>S.lvl.add[0].done},
+ {id:'s1',e:'➖',n:'Subtrator',d:'Conclua o nível 1 de subtração',ok:()=>S.lvl.sub[0].done},
+ {id:'as4',e:'🌟',n:'Mestre do mais e do menos',d:'Conclua o nível 4 de adição e de subtração',ok:()=>S.lvl.add[3].done&&S.lvl.sub[3].done},
+ {id:'hour',e:'🚀',n:'Missão cumprida',d:'Complete a Missão de 1 hora',ok:()=>S.t.missions>=1}];
+function checkTrophies(){for(const t of TROPHIES){if(!S.trophies.includes(t.id)&&t.ok()){S.trophies.push(t.id);toast(`🏆 Novo troféu: ${t.n}!`);confetti(20);}}save();}
+
+/* ============ motor de contas: geradores ============ */
+const factHelp=(a,b)=>{if(a===0||b===0)return '0 vezes qualquer número é 0.';if(a===1||b===1)return `1 vezes um número é o próprio número: ${a*b}.`;const x=Math.max(a,b),k=Math.min(a,b),l=[];for(let i=1;i<=k;i++)l.push(x*i);return `Conte de ${x} em ${x}, ${k} vezes: ${l.join(', ')}.`;};
+function genMult(L){
+  for(let t=0;t<300;t++){let a,b;
+    if(L===1){b=rnd(2,4);const m=Math.floor(9/b);a=rnd(1,m)*10+rnd(1,m);}
+    else if(L===2){b=rnd(2,9);a=rnd(12,99);}
+    else if(L===3){b=rnd(2,9);a=rnd(101,499);}
+    else{a=rnd(12,49);b=rnd(12,29);}
+    if((L===2||L===3)&&!digs(a).some(d=>d*b>=10))continue;
+    if(L===4&&(a%10===0||b%10===0))continue;
+    return[a,b];}
+  return[24,3];}
+function genDiv(L){let d,D;
+  if(L===1){d=rnd(2,5);D=d*rnd(2,9);}
+  else if(L===2){d=rnd(2,8);D=d*rnd(10,Math.floor(99/d));}
+  else if(L===3){d=rnd(3,9);if(Math.random()<.2)D=d*rnd(Math.ceil(20/d),Math.floor(99/d));else{do{D=rnd(20,99);}while(D%d===0);}}
+  else{d=rnd(3,9);if(Math.random()<.15)D=d*rnd(Math.ceil(100/d),Math.floor(999/d));else{do{D=rnd(100,999);}while(D%d===0);}}
+  return[D,d];}
+
+/* ---- adição e subtração armadas ---- */
+const addHelp=(a,b)=>{if(a===0||b===0)return'Somar 0 não muda o número.';const x=Math.max(a,b),k=Math.min(a,b),l=[];for(let i=1;i<=k;i++)l.push(x+i);return`Comece em ${x} e conte mais ${k}: ${l.join(', ')}.`;};
+const subHelp=(a,b)=>{if(b===0)return'Tirar 0 não muda o número.';const l=[];for(let i=1;i<=Math.min(b,10);i++)l.push(a-i);return`Comece em ${a} e volte ${b}: ${l.join(', ')}${b>10?'…':''}.`;};
+const COLN=['unidades','dezenas','centenas','milhares'];
+function subSim(A,B){const n=digs(A).length,t=digs(A).reverse(),b=digs(B).reverse();let bw=0,ok=true;for(let i=0;i<n;i++){const bi=b[i]||0;if(t[i]<bi){if(i+1>=n||t[i+1]<1){ok=false;break;}t[i+1]--;bw++;}}return{ok,bw};}
+function genAdd(L){for(let k=0;k<400;k++){let a,b;
+  if(L===1){a=rnd(1,9);b=rnd(1,9);}
+  else if(L===2){const a1=rnd(1,8),b1=rnd(1,9-a1),a2=rnd(0,8),b2=rnd(0,9-a2);a=a1*10+a2;b=b1*10+b2;}
+  else if(L===3){a=rnd(15,89);b=rnd(15,89);if(a%10+b%10<10)continue;}
+  else{a=rnd(120,899);b=rnd(120,899);if(a+b>999)continue;if(a%10+b%10<10&&(Math.floor(a/10)%10)+(Math.floor(b/10)%10)<10)continue;}
+  return[a,b];}return[24,13];}
+function genSub(L){for(let k=0;k<600;k++){let a,b;
+  if(L===1){a=rnd(10,19);b=rnd(1,9);if(a%10<b)continue;}
+  else if(L===2){const a1=rnd(2,9),b1=rnd(1,a1-1),a2=rnd(1,9),b2=rnd(0,a2);a=a1*10+a2;b=b1*10+b2;}
+  else if(L===3){a=rnd(32,99);b=rnd(11,a-10);if(a%10>=b%10)continue;if(a-b<10)continue;}
+  else{a=rnd(210,999);b=rnd(101,a-60);if(a-b<100)continue;const r=subSim(a,b);if(!r.ok||r.bw<1)continue;}
+  return[a,b];}return[52,27];}
+function buildAdd(A,B){
+  const ad=digs(A),bd=digs(B),n=Math.max(ad.length,bd.length),total=A+B,tl=String(total).length,W=Math.max(n,tl)+1;
+  const rows=[],steps=[],mk=cls=>{const r={cls,cells:Array.from({length:W},()=>({k:'blank'}))};rows.push(r);return r;};
+  const dA=digs(A).reverse(),dB=digs(B).reverse();
+  let c=0,anyC=false;const plan=[];
+  for(let i=0;i<tl;i++){const a=dA[i]||0,b=dB[i]||0,t=a+b+c,dg=t%10,out=Math.floor(t/10);plan.push({i,a,b,c,t,dg,out});if(out>0&&i<tl-1)anyC=true;c=out;}
+  const cr=anyC?mk('carry'):null,rA=mk(''),rB=mk('');
+  ad.forEach((d,k)=>rA.cells[W-ad.length+k]={k:'fixed',v:d});bd.forEach((d,k)=>rB.cells[W-bd.length+k]={k:'fixed',v:d});rB.cells[W-n-1]={k:'sign',v:'+'};
+  mk('sep');const rr=mk('');
+  for(const p of plan){const id=`d${p.i}`;rr.cells[W-1-p.i]={k:'in',id};const ce=p.c?` + ${p.c}`:'',nm=COLN[p.i]||'coluna';
+    const beyond=p.i>=n;
+    steps.push({kind:beyond?'lead':'adig',cells:[id],exp:String(p.dg),
+      prompt:beyond?`Não tem mais números. Desça o vai-um: quanto é?`:`Coluna das ${nm}: quanto é ${p.a} + ${p.b}${ce}?${p.out>0&&p.i<tl-1?' Escreva só a unidade; o resto "vai".':''}`,
+      short:beyond?'desça o vai-um':`${p.a} + ${p.b}${ce} = ?`,
+      ok:beyond?`Desceu o ${p.dg}`:`${p.a} + ${p.b}${ce} = ${p.t}`+(p.out>0&&p.i<tl-1?` → escreve ${p.dg}, vai ${p.out}`:''),
+      help1:beyond?'O vai-um desce para o resultado.':addHelp(p.a,p.b)+(p.c?` Depois some o vai-um ${p.c}.`:''),
+      help2:beyond?`Desça o vai-um: <b>${p.dg}</b>.`:`<b>${p.a} + ${p.b}${ce} = ${p.t}</b>. `+(p.out>0&&p.i<tl-1?`O ${p.dg} fica aqui e o ${p.out} "vai" para a próxima coluna. `:'')+`Escreva <b>${p.dg}</b>.`,
+      vis:beyond?null:{type:'add',a:p.a,b:p.b}});
+    if(p.out>0&&p.i<tl-1){const cid=`c${p.i}`;cr.cells[W-2-p.i]={k:'in',id:cid,cls:'sm'};
+      steps.push({kind:'carry',cells:[cid],exp:String(p.out),prompt:`Quanto "vai" para a próxima coluna? Do ${p.t}, o ${p.dg} fica e o resto sobe.`,short:'vai-um?',ok:`Vai ${p.out}`,help1:`${p.t} tem quantas dezenas inteiras? Elas "vão".`,help2:`${p.t} = ${p.out} dezena(s) e ${p.dg} unidade(s): vai <b>${p.out}</b>.`});}}
+  return{type:'v',rows,steps,answer:total};}
+function buildSub(A,B){
+  const ad=digs(A),n=ad.length,res=A-B,rl=String(res).length,W=n+1;
+  const rows=[],steps=[],mk=cls=>{const r={cls,cells:Array.from({length:W},()=>({k:'blank'}))};rows.push(r);return r;};
+  const top=digs(A).reverse(),bot=digs(B).reverse();let need=false;{const t=top.slice();for(let i=0;i<rl;i++){if(t[i]<(bot[i]||0)){need=true;t[i+1]--;}}}
+  const bw=need?mk('carry'):null,rA=mk(''),rB=mk('');
+  ad.forEach((d,k)=>rA.cells[W-n+k]={k:'fixed',v:d,id:'f'+(n-1-k)});digs(B).forEach((d,k,arr)=>rB.cells[W-arr.length+k]={k:'fixed',v:d});rB.cells[W-n-1]={k:'sign',v:'−'};
+  mk('sep');const rr=mk('');const cur=top.slice();
+  for(let i=0;i<rl;i++){let t=cur[i];const b=bot[i]||0,nm=COLN[i]||'coluna';
+    if(t<b){const old=cur[i+1],nv=old-1,cid=`bw${i}`;bw.cells[W-2-i]={k:'in',id:cid,cls:'sm'};
+      steps.push({kind:'borrow',cells:[cid],exp:String(nv),strike:'f'+(i+1),prompt:`Coluna das ${nm}: ${t} é menor que ${b}, não dá! Empreste 1 da casa vizinha. O ${old} vizinho vira quanto?`,short:`empreste: ${old} vira?`,ok:`O vizinho ${old} virou ${nv}`,help1:`Pegamos 1 emprestado do vizinho: ele perde 1. ${old} − 1 = ?`,help2:`${old} − 1 = <b>${nv}</b>. Escreva ${nv} em cima do ${old}. E o ${t} vira ${t+10}.`});
+      cur[i+1]=nv;t+=10;}
+    const r=t-b,id=`d${i}`;rr.cells[W-1-i]={k:'in',id};
+    steps.push({kind:'sdig',cells:[id],exp:String(r),prompt:`Coluna das ${nm}: quanto é ${t} − ${b}?${t>=10&&cur[i]!==top[i]?` (o ${top[i]} virou ${t})`:''}`,short:`${t} − ${b} = ?`,ok:`${t} − ${b} = ${r}`,help1:subHelp(t,b),help2:`<b>${t} − ${b} = ${r}</b>, porque ${b} + ${r} = ${t}.`,vis:{type:'sub',a:t,b}});}
+  return{type:'v',rows,steps,answer:res};}
+
+/* ---- multiplicação armada (método tradicional) ---- */
+function buildMult(A,B){
+  const ad=digs(A),bd=digs(B),n=ad.length,m=bd.length,total=A*B,tl=String(total).length;
+  const W=Math.max(n+m,tl)+1,rows=[],steps=[];
+  const mk=cls=>{const r={cls,cells:Array.from({length:W},()=>({k:'blank'}))};rows.push(r);return r;};
+  const P=[];
+  for(let j=0;j<m;j++){const bj=bd[m-1-j];let c=0;const cols=[];
+    for(let i=0;i<n;i++){const ai=ad[n-1-i],t=ai*bj+c;cols.push({ai,bj,c,t,dg:t%10,out:Math.floor(t/10),last:i===n-1});c=Math.floor(t/10);}
+    P.push({j,bj,cols,val:A*bj});}
+  const crow=[];
+  for(let j=m-1;j>=0;j--)if(P[j].cols.some(c=>c.out>0&&!c.last))crow[j]=mk('carry');
+  const rA=mk('');ad.forEach((d,i)=>rA.cells[W-n+i]={k:'fixed',v:d});
+  const rB=mk('');bd.forEach((d,i)=>rB.cells[W-m+i]={k:'fixed',v:d});rB.cells[W-m-1]={k:'sign',v:'×'};
+  mk('sep');
+  const prow=[];for(let j=0;j<m;j++){const r=mk('');prow[j]=r;for(let q=0;q<j;q++)r.cells[W-1-q]={k:'ph',v:0};}
+  for(const p of P){const r=prow[p.j];
+    p.cols.forEach((c,i)=>{
+      const col=W-1-p.j-i,id=`m${p.j}_${i}`,cr=c.c?` + ${c.c}`:'';
+      r.cells[col]={k:'in',id};
+      const intro=(p.j>0&&i===0)?`Agora multiplicamos pelo ${p.bj} (das dezenas) — por isso começamos com um 0. `:'';
+      const q1=c.last&&c.out>0?`Última coluna! Calcule ${c.ai} × ${c.bj}${cr} e escreva o resultado inteiro, começando pela unidade.`:(c.t<10?`Quanto é ${c.ai} × ${c.bj}${cr}?`:`Calcule ${c.ai} × ${c.bj}${cr}. Escreva só o algarismo da unidade; o resto "vai" para a coluna ao lado.`);
+      steps.push({kind:'mdig',cells:[id],exp:String(c.dg),prompt:intro+q1,short:`${c.ai} × ${c.bj}${cr} = ?`,
+        ok:`${c.ai} × ${c.bj}${cr} = ${c.t}`+(c.out>0&&!c.last?` → escreve ${c.dg} e vai ${c.out}`:''),
+        help1:factHelp(c.ai,c.bj)+(c.c?` Depois some o vai-um ${c.c}.`:''),
+        help2:`<b>${c.ai} × ${c.bj} = ${c.ai*c.bj}</b>`+(c.c?`; mais o vai-um ${c.c}: <b>${c.t}</b>`:'')+`. `+(c.out>0&&!c.last?`O ${c.dg} fica aqui e o ${c.out} "vai" para a próxima coluna. `:(c.last&&c.out>0?`Como é a última coluna, escrevemos o número todo: ${c.dg} aqui e ${c.out} ao lado. `:''))+`Escreva <b>${c.dg}</b>.`,
+        vis:{type:'array',a:c.ai,b:c.bj}});
+      if(c.out>0&&!c.last){const cid=`c${p.j}_${i}`;crow[p.j].cells[W-2-i]={k:'in',id:cid,cls:'sm'};
+        steps.push({kind:'carry',cells:[cid],exp:String(c.out),prompt:`Quanto "vai" para a próxima coluna? Do ${c.t}, o ${c.dg} fica e o resto sobe.`,short:`vai-um?`,ok:`Vai ${c.out} para cima da próxima coluna`,help1:`${c.t} tem quantas dezenas inteiras? Elas é que "vão".`,help2:`${c.t} = ${c.out} dezena(s) e ${c.dg} unidade(s). As dezenas vão para a coluna do lado: <b>${c.out}</b>.`});}
+      if(c.last&&c.out>0){const lid=`m${p.j}_${i}L`;r.cells[col-1]={k:'in',id:lid};
+        steps.push({kind:'lead',cells:[lid],exp:String(c.out),prompt:`Agora escreva a dezena do ${c.t}, ao lado.`,short:`dezena do ${c.t}?`,ok:`${c.t}: ${c.out} dezena(s) e ${c.dg} unidade(s)`,help1:`O número ${c.t} tem dois algarismos. Já escrevemos o da direita.`,help2:`${c.t} = <b>${c.out}</b>${c.dg}. Escreva o ${c.out} ao lado do ${c.dg}.`});}
+    });}
+  if(m>1){mk('sep');const scar=mk('carry'),rs=mk('');let c=0,any=false;
+    for(let s=0;s<tl;s++){
+      const terms=P.map(p=>{if(s<p.j)return 0;const str=String(p.val),idx=s-p.j;return idx<str.length?+str[str.length-1-idx]:0;});
+      const t=terms.reduce((x,y)=>x+y,0)+c,dg=t%10,out=Math.floor(t/10),id=`s${s}`;
+      rs.cells[W-1-s]={k:'in',id};
+      const expr=terms.join(' + ')+(c?` + ${c}`:'');
+      steps.push({kind:'sum',cells:[id],exp:String(dg),prompt:`Some a coluna: ${expr}.${out>0&&s<tl-1?' Escreva a unidade; o resto "vai".':''}`,short:`${expr} = ?`,ok:`${expr} = ${t}`+(out>0&&s<tl-1?` → escreve ${dg}, vai ${out}`:''),help1:`Some com calma: ${terms.join(' + ')}${c?' e depois o vai-um '+c:''}.`,help2:`<b>${expr} = ${t}</b>. Escreva <b>${dg}</b>${out>0&&s<tl-1?` e "vai" ${out}`:''}.`});
+      if(out>0&&s<tl-1){const cid=`sc${s}`;scar.cells[W-2-s]={k:'in',id:cid,cls:'sm'};any=true;
+        steps.push({kind:'carry',cells:[cid],exp:String(out),prompt:`Quanto "vai" para a próxima coluna da soma?`,short:'vai-um?',ok:`Vai ${out}`,help1:`${t} tem quantas dezenas inteiras?`,help2:`${t} = ${out} dezena(s) e ${dg} unidade(s): vai <b>${out}</b>.`});}
+      c=out;}
+    if(!any)rows.splice(rows.indexOf(scar),1);}
+  return{type:'v',rows,steps,answer:total,W};}
+
+/* ---- divisão pela chave (método tradicional) ---- */
+function buildDiv(D,d){
+  const dd=digs(D),n=dd.length;let pos0=0,cur=dd[0];
+  if(cur<d&&n>1){pos0=1;cur=dd[0]*10+dd[1];}
+  const W=n+1,rows=[],steps=[],quot=[];
+  const mkr=()=>{const r=Array.from({length:W},()=>({k:'blank'}));rows.push(r);return r;};
+  const r0=mkr();dd.forEach((x,i)=>r0[i+1]={k:'fixed',v:x});
+  let rem=0;const nS=n-pos0;
+  for(let k=0;k<nS;k++){
+    const pos=pos0+k;if(k>0)cur=rem*10+dd[pos];
+    const q=Math.floor(cur/d),p=q*d,r=cur-p,pr=mkr(),rr=mkr(),pc=pos+1,ps=String(p),rs=String(r);
+    pr[pc-ps.length]={k:'sign',v:'−'};
+    const pids=[...ps].map((_,t)=>`p${k}_${t}`);pids.forEach((id,t)=>pr[pc-ps.length+1+t]={k:'in',id});
+    const rids=[...rs].map((_,t)=>`r${k}_${t}`);rids.forEach((id,t)=>rr[pc-rs.length+1+t]={k:'in',id});
+    quot.push({k:'in',id:`q${k}`});
+    const ml=[];for(let i=1;i<=Math.min(q+1,10);i++)ml.push(d*i);
+    const first=k===0?(pos0===1?`Como o ${dd[0]} é menor que ${d}, usamos os dois primeiros algarismos: ${cur}. `:''):`Agora temos ${cur}. `;
+    steps.push({kind:'q',cells:[`q${k}`],exp:String(q),prompt:`${first}Quantas vezes o ${d} cabe em ${cur}?`,short:`${cur} ÷ ${d} → quociente?`,
+      ok:q===0?`${d} não cabe em ${cur}: 0 vezes`:`${d} × ${q} = ${p} cabe em ${cur}`,
+      help1:q===0?`${d} é maior que ${cur}, então cabe 0 vezes.`:`Tabuada do ${d}: ${ml.join(', ')}. O maior que não passa de ${cur} é ${p}.`,
+      help2:q===0?`${d} é maior que ${cur}, por isso cabe <b>0</b> vezes.`:`<b>${d} × ${q} = ${p}</b> cabe em ${cur}, mas <b>${d} × ${q+1} = ${d*(q+1)}</b> já passa de ${cur}. O quociente é <b>${q}</b>.`,
+      vis:{type:'groups',total:cur,size:d}});
+    steps.push({kind:'p',cells:pids,exp:ps,prompt:`Multiplique: ${q} × ${d} = ? Escreva embaixo do ${cur}.`,short:`${q} × ${d} = ?`,ok:`${q} × ${d} = ${p}`,help1:factHelp(q,d),help2:`<b>${q} × ${d} = ${p}</b>. Escreva ${p} embaixo, alinhado à direita.`});
+    steps.push({kind:'r',cells:rids,exp:rs,prompt:`Subtraia: ${cur} − ${p} = ?`,short:`${cur} − ${p} = ?`,ok:`${cur} − ${p} = ${r}${r<d?` (menor que ${d} ✓)`:''}`,help1:`Quanto falta de ${p} para chegar em ${cur}? ${p} + ? = ${cur}.`,help2:`<b>${cur} − ${p} = ${r}</b>, porque ${p} + ${r} = ${cur}.`});
+    if(pos<n-1){rr[pc+1]={k:'hid',id:`b${k}`,v:dd[pos+1]};steps.push({kind:'down',reveal:`b${k}`,digit:dd[pos+1],exp:'',prompt:`Baixe o próximo algarismo (o ${dd[pos+1]}) com o botão ⬇.`,short:'⬇ baixe o '+dd[pos+1],ok:`Baixamos o ${dd[pos+1]}`});}
+    rem=r;}
+  return{type:'d',rows,quot,steps,answer:Math.floor(D/d),rest:D%d};}
+
+const GEN={mult:genMult,div:genDiv,add:genAdd,sub:genSub},BLD={mult:buildMult,div:buildDiv,add:buildAdd,sub:buildSub};
+const OPS={mult:'×',div:'÷',add:'+',sub:'−'},KNAME={mult:'Multiplicação',div:'Divisão',add:'Adição',sub:'Subtração'};
+function makeExercise(kind,L){const[a,b]=GEN[kind](L);return Object.assign({kind,L,a,b,errTotal:0},BLD[kind](a,b));}
+
+/* ============ renderização do caderno ============ */
+function mkCell(c,map){const e=h('div',{class:'cell '+c.k+' '+(c.cls||'')});if(c.k==='fixed'||c.k==='sign'||c.k==='ph')e.textContent=c.v;if(c.id)map[c.id]=e;return e;}
+function renderV(ex,map){const box=h('div',{class:'vwrap'});ex.rows.forEach(r=>{const row=h('div',{class:'vrow '+(r.cls||'')});r.cells.forEach(c=>row.append(mkCell(c,map)));box.append(row);});return box;}
+function renderD(ex,map){const left=h('div',{});ex.rows.forEach((r,ri)=>{const row=h('div',{class:'vrow'});r.forEach((c,ci)=>{const e=mkCell(c,map);if(ri===0&&ci===r.length-1)e.classList.add('chave');row.append(e);});left.append(row);});
+  const right=h('div',{class:'dright'},h('div',{class:'dv'},h('div',{class:'cell fixed'},ex.b)));const qr=h('div',{class:'qrow'});ex.quot.forEach(c=>qr.append(mkCell(c,map)));right.append(qr);return h('div',{class:'dwrap'},left,right);}
+function visual(v){if(!v)return null;
+  if(v.type==='array'&&v.a>0&&v.b>0&&v.a*v.b<=81){const g=h('div',{class:'arr',style:`grid-template-columns:repeat(${v.b},20px)`});for(let i=0;i<v.a*v.b;i++)g.append(h('i'));return h('div',{},g,h('div',{class:'small'},`${v.a} linhas de ${v.b} = ${v.a*v.b}`));}
+  if(v.type==='add'&&v.a+v.b<=20){const bg=(n,cl)=>{const x=h('div',{class:'bag '+cl});for(let j=0;j<n;j++)x.append(h('i'));return x;};return h('div',{},h('div',{class:'vis'},bg(v.a,''),h('b',{style:'font-size:30px'},'+'),bg(v.b,'rest')),h('div',{class:'small'},`${v.a} + ${v.b} = ${v.a+v.b}`));}
+  if(v.type==='sub'&&v.a<=20){const x=h('div',{class:'bag',style:'max-width:260px'});for(let j=0;j<v.a;j++)x.append(h('i',{style:j>=v.a-v.b?'background:#cbd5e1':''}));return h('div',{},h('div',{class:'vis'},x),h('div',{class:'small'},`${v.a} bolinhas; tiramos ${v.b} (as cinzas) e sobram ${v.a-v.b}`));}
+  if(v.type==='groups'&&v.total<=60){const full=Math.floor(v.total/v.size),rest=v.total%v.size,box=h('div',{class:'vis'});for(let i=0;i<full;i++){const b=h('div',{class:'bag'});for(let j=0;j<v.size;j++)b.append(h('i'));box.append(b);}if(rest){const b=h('div',{class:'bag rest'});for(let j=0;j<rest;j++)b.append(h('i'));box.append(b);}return h('div',{},box,h('div',{class:'small'},`${v.total} em grupos de ${v.size}: ${full} grupo(s)${rest?` e sobram ${rest}`:''}`));}
+  return null;}
+const MULT_TRICK={1:'Qualquer número vezes 1 é ele mesmo.',2:'Vezes 2 é o dobro.',3:'Vezes 3 é o dobro mais mais uma vez o número.',4:'Vezes 4 é o dobro do dobro.',5:'Vezes 5 termina sempre em 0 ou 5 (é a metade do vezes 10).',6:'Vezes 6 é vezes 5 mais mais uma vez o número.',7:'Vezes 7 é vezes 5 mais vezes 2.',8:'Vezes 8 é o dobro do dobro do dobro.',9:'Vezes 9: a soma dos algarismos do resultado dá 9 (9×7=63 → 6+3=9).',10:'Vezes 10: é só colocar um zero no fim.'};
+const ENC=['Quase! Errar faz parte de aprender — vamos pensar juntos.','Boa tentativa! Olha essa dica:','Ótimo esforço! Vamos descobrir o truque:','Calma, você consegue! Veja a dica:'];
+const PRAISE=['Isso aí!','Mandou bem!','Perfeito!','Muito bem!','Show!','Você é demais!','Craque da matemática!'];
+
+/* teclas */
+function makePad(ctl){const pad=h('div',{id:'pad'});range(1,9).forEach(n=>pad.append(h('button',{class:'w',onclick:()=>ctl.digit(String(n))},n)));pad.append(h('button',{class:'o',onclick:()=>ctl.back()},'⌫'),h('button',{class:'w',onclick:()=>ctl.digit('0')},'0'),ctl.extraLabel?h('button',{class:'y',onclick:()=>ctl.extra&&ctl.extra()},ctl.extraLabel):h('div'));return pad;}
+function bindKeys(ctl){const f=e=>{if(/^\d$/.test(e.key))ctl.digit(e.key);else if(e.key==='Backspace')ctl.back();};document.addEventListener('keydown',f);return()=>document.removeEventListener('keydown',f);}
+
+/* ============ exercício no caderno ============ */
+function runExercise(ex,ctx){
+  return new Promise(resolve=>{
+    running=true;
+    const map={},st={i:0,buf:'',assists:0,hints:0,busy:false,over:false};
+    const body=ex.type==='v'?renderV(ex,map):renderD(ex,map);
+    const dots=h('div',{class:'dots'});for(let i=0;i<ctx.count;i++)dots.append(h('span',{class:'dot'+(i<ctx.idx?' d':i===ctx.idx?' c':'')}));
+    const paper=h('div',{class:'paper'},h('div',{class:'ptitle'},h('span',{},`${KNAME[ex.kind]} · Nível ${ex.L}`),dots),h('div',{class:'prob'},`${ex.a} ${OPS[ex.kind]} ${ex.b}`),body);
+    const bubble=h('div',{class:'bubble'}),fb=h('div',{class:'fb'});
+    const down=h('button',{class:'o',style:'display:none;width:100%'},'⬇ Baixar o próximo número');
+    const ctl={digit:d=>press(d),back:()=>back(),extra:()=>hint(),extraLabel:'💡'};
+    const side=h('div',{class:'side'},h('div',{class:'coach'},mascot('sm'),bubble),fb,down,makePad(ctl));
+    stage.replaceChildren(h('div',{class:'nbgrid'},paper,side));
+    const unbind=bindKeys(ctl);
+    const step=()=>ex.steps[st.i];
+    const setB=(html,speak=true)=>{bubble.innerHTML=html;if(speak)say(html);};
+    const paintActive=()=>{document.querySelectorAll('.cell.act,.cell.cur').forEach(e=>e.classList.remove('act','cur'));const s=step();if(!s)return;if(s.kind==='down'){map[s.reveal].classList.add('cur');return;}s.cells.forEach((id,t)=>map[id].classList.add(t===st.buf.length?'cur':'act'));};
+    const showBuf=()=>{const s=step();s.cells.forEach((id,t)=>{map[id].textContent=st.buf[t]||'';});paintActive();};
+    function press(d){if(st.busy||st.over)return;const s=step();if(!s||s.kind==='down')return;if(st.buf.length>=s.exp.length)return;st.buf+=d;SFX.tap();showBuf();if(st.buf.length===s.exp.length)setTimeout(submit,180);}
+    function back(){if(st.busy||st.over)return;st.buf=st.buf.slice(0,-1);showBuf();}
+    function hint(){if(st.busy||st.over)return;const s=step();if(!s||!s.help1)return;st.hints++;setB('💡 '+s.help1);}
+    async function submit(){if(st.busy)return;const s=step();if(st.buf===s.exp)await good(s);else await bad(s);}
+    async function good(s){st.busy=true;s.cells.forEach(id=>{map[id].classList.remove('act','cur');map[id].classList.add(s.assisted?'assist':'ok');});if(s.strike&&map[s.strike])map[s.strike].classList.add('strike');SFX.ok();
+      SES.ok++;combo++;S.t.combo=Math.max(S.t.combo,combo);addXp(1);if(combo%5===0){S.coins+=3;toast(`🔥 Combo ×${combo}! +3 🪙`);}updHeader();
+      fb.textContent='✔ '+s.ok;st.i++;st.buf='';await sleep(430);st.busy=false;next();}
+    async function bad(s){st.busy=true;s.errs=(s.errs||0)+1;ex.errTotal++;SES.err++;S.errKinds[s.kind]=(S.errKinds[s.kind]||0)+1;combo=0;updHeader();SFX.oops();
+      s.cells.forEach(id=>map[id].classList.add('shake','bad'));await sleep(450);s.cells.forEach(id=>{map[id].classList.remove('shake','bad');map[id].textContent='';});st.buf='';
+      if(s.errs===1)setB(pick(ENC)+'<br>💡 '+s.help1);
+      else if(s.errs===2){const sp='Vamos entender juntos. '+s.help2+' Agora tente você.';sayKid(sp);await modal([h('h2',{},'Vamos entender juntos 🧠'),h('div',{class:'ex',html:s.help2}),visual(s.vis),replayBtn(sp)],'Entendi!');s.assisted=true;st.assists++;setB(`Agora é com você: digite <b>${s.exp}</b> e vamos em frente! 💪`);}
+      else setB(`A resposta é <b>${s.exp}</b>. Digite e siga em frente — você está aprendendo!`);
+      st.busy=false;paintActive();}
+    down.onclick=()=>{if(st.busy||st.over)return;const s=step();if(!s||s.kind!=='down')return;map[s.reveal].textContent=s.digit;map[s.reveal].classList.remove('cur');map[s.reveal].classList.add('ok');SFX.ok();fb.textContent='✔ '+s.ok;st.i++;next();};
+    function next(){if(st.i>=ex.steps.length)return finish();const s=step();st.buf='';down.style.display=s.kind==='down'?'':'none';setB(ctx.L>=3&&s.kind!=='down'?`<b>${s.short}</b>`:s.prompt);paintActive();}
+    async function finish(){st.over=true;unbind();document.querySelectorAll('.cell.cur,.cell.act').forEach(e=>e.classList.remove('cur','act'));down.style.display='none';
+      const stars=ex.errTotal===0?3:ex.errTotal<=2?2:1;
+      if(ex.kind!=='div')setB(`Resposta: <b>${ex.answer}</b>! ${pick(PRAISE)} 🎉`);
+      else setB(`Quociente <b>${ex.answer}</b>${ex.rest?`, resto <b>${ex.rest}</b>`:' (divisão exata)'}.<br>Prova real: ${ex.answer} × ${ex.b}${ex.rest?` + ${ex.rest}`:''} = ${ex.a} ✓`);
+      fb.textContent='';await sleep(1700);running=false;resolve({stars,errors:ex.errTotal,assists:st.assists,hints:st.hints});}
+    next();
+  });}
+
+/* ============ recompensas e níveis ============ */
+async function rewardModal(r){
+  const coins=r.stars*3+(r.errors===0?2:0);S.coins+=coins;S.stars+=r.stars;addXp(5);S.t.ex++;save();updHeader();
+  confetti(r.stars*10+8);SFX.win();
+  const msg=r.stars===3?'Sem erros! Você é craque!':r.stars===2?'Mandou bem! Errar faz parte de aprender.':'Você terminou — e isso é o que importa! Cada tentativa deixa seu cérebro mais forte 💪';
+  await modal([h('h2',{},pick(PRAISE)),h('div',{class:'big'},'⭐'.repeat(r.stars)+'☆'.repeat(3-r.stars)),h('p',{},msg),h('p',{},h('b',{},`+${coins} 🪙`),'  ·  +5 XP')],'Próximo ➜');checkTrophies();}
+function bumpStats(ex,r){const k=ex.kind+ex.L;const s=S.stats[k]||(S.stats[k]={ex:0,clean:0,err:0,assist:0});s.ex++;if(r.errors===0)s.clean++;s.err+=r.errors;s.assist+=r.assists;}
+async function actNotebook(kind,L,count,opts={}){
+  let stars=0,low=0;const seen=new Set();
+  for(let i=0;i<count;i++){
+    let useL=L;if(low>=2&&L>1){useL=L-1;toast('Vamos aquecer com um mais fácil 😉');low=0;}
+    let ex,tries=0;do{ex=makeExercise(kind,useL);tries++;}while(seen.has(ex.a+'_'+ex.b)&&tries<20);seen.add(ex.a+'_'+ex.b);
+    const r=await runExercise(ex,{idx:i,count,L:useL});bumpStats(ex,r);stars+=r.stars;low=r.stars===1?low+1:0;
+    await rewardModal(r);
+    if(opts.breakAfter===i+1&&i<count-1)await actBalloons(4,{mult:['x','x','x','/'],div:['/','/','x'],add:['+','+','-'],sub:['-','-','+']}[kind]);}
+  return{stars,max:count*3};}
+const LVL_TXT={add:['Somas até 20 (um algarismo + um algarismo)','2 algarismos, sem "vai-um"','2 algarismos, com "vai-um"','3 algarismos, com "vai-um"'],sub:['Subtrações até 20, sem emprestar','2 algarismos, sem emprestar','2 algarismos, emprestando','3 algarismos, emprestando'],mult:['2 algarismos × 1 (sem "vai-um")','2 algarismos × 1 (com "vai-um")','3 algarismos × 1','2 algarismos × 2 (desafio!)'],div:['Divisão exata (tabuada ao contrário)','Exata, quociente com 2 algarismos','Com resto: 2 algarismos ÷ 1','Com resto: 3 algarismos ÷ 1']};
+const firstOpen=kind=>{const i=S.lvl[kind].findIndex(l=>!l.done);return i<0?4:i+1;};
+async function playLevel(kind,L){
+  S.lvl[kind][L-1].tries++;save();
+  const res=await actNotebook(kind,L,5,{breakAfter:3});
+  const lv=S.lvl[kind][L-1];lv.best=Math.max(lv.best,res.stars);const was=lv.done;if(res.stars>=9||lv.tries>=2)lv.done=true;save();
+  const med=res.stars>=13?'🥇 Ouro':res.stars>=9?'🥈 Prata':'🥉 Bronze';
+  confetti(50);SFX.win();
+  await modal([h('h2',{},`Nível ${L} concluído!`),h('div',{class:'big'},med.split(' ')[0]),h('p',{},`Medalha de ${med.split(' ')[1]} — ${res.stars} de ${res.max} estrelas.`),
+    h('p',{},res.stars>=13?'Perfeito! Você domina este nível.':res.stars>=9?'Muito bem! Quer tentar de novo para ganhar ouro?':'Ótimo trabalho! Com mais uma rodada você sobe de medalha. Treino é o que faz a gente ficar bom!'),
+    (lv.done&&!was&&L<4)?h('p',{},`🔓 Nível ${L+1} desbloqueado!`):null],'Continuar');
+  checkTrophies();screenLevels(kind);}
+function screenLevels(kind){
+  running=false;const nm={mult:'Multiplicação ✖️',div:'Divisão ➗',add:'Adição ➕',sub:'Subtração ➖'}[kind];
+  const list=S.lvl[kind];
+  stage.replaceChildren(h('h1',{},nm),h('p',{},'Cada nível tem 5 exercícios no caderno, com estrelas, moedas e um intervalo divertido no meio.'),
+    h('div',{class:'levels'},list.map((l,i)=>{const open=i===0||list[i-1].done;const med=l.best>=13?'🥇':l.best>=9?'🥈':l.best>0?'🥉':'';
+      return h('div',{class:'lv'+(open?'':' locked')},h('div',{class:'n'},`Nível ${i+1}`),h('div',{class:'small'},LVL_TXT[kind][i]),h('div',{class:'med'},open?med:'🔒'),h('button',{class:open?'g':'w',onclick:()=>open&&playLevel(kind,i+1)},open?(l.tries?'Jogar de novo':'Jogar'):'Bloqueado'));})),
+    (kind==='add'||kind==='sub')?h('div',{class:'card',style:'margin-top:14px;text-align:center'},h('h3',{},'⚡ Relâmpago de '+(kind==='add'?'somas':'subtrações')),h('p',{class:'small'},'10 contas de cabeça, contra o relógio. As que você erra voltam logo.'),h('div',{class:'chips'},h('button',{class:'o',onclick:async()=>{await actFacts({mode:'timed',tables:[10],count:10,op:kind==='add'?'+':'-'});screenLevels(kind);}},'Até 10'),h('button',{class:'r',onclick:async()=>{await actFacts({mode:'timed',tables:[20],count:10,op:kind==='add'?'+':'-'});screenLevels(kind);}},'Até 20'))):null,
+    h('p',{class:'small'},'Dica: a medalha de ouro exige 13 ou mais estrelas das 15 possíveis.'));}
+
+/* ============ tabuada: memória, relâmpago e oral ============ */
+const fk=(a,b)=>a+'x'+b;
+const factOf=f=>{const k=f.op?`${f.a}${f.op}${f.b}`:fk(f.a,f.b);return S.facts[k]||(S.facts[k]={box:0,seen:0,ok:0});};
+const valF=f=>f.op==='+'?f.a+f.b:f.op==='-'?f.a-f.b:f.a*f.b,symF=f=>f.op==='+'?'+':f.op==='-'?'−':'×';
+function genSum(op,max,n){const seen=new Set(),out=[];let g=0;while(out.length<n&&g++<500){let a,b;if(op==='+'){a=rnd(1,Math.max(1,max-1));b=rnd(1,Math.max(1,max-a));if(a+b>max)continue;}else{a=rnd(2,max);b=rnd(1,a-1);}const k=a+op+b;if(seen.has(k))continue;seen.add(k);out.push({a,b,op});}return out;}
+const fact=(a,b)=>S.facts[fk(a,b)]||(S.facts[fk(a,b)]={box:0,seen:0,ok:0});
+const boxOf=(a,b)=>(S.facts[fk(a,b)]||{box:0}).box;
+const masteredTables=()=>range(1,10).filter(t=>range(1,10).every(b=>boxOf(t,b)>=3)).length;
+function pickFacts(tables,n){const pool=[];tables.forEach(a=>range(1,10).forEach(b=>pool.push({a,b,w:[7,4,3,2,1][boxOf(a,b)]})));const out=[];while(out.length<n&&pool.length){let tot=pool.reduce((s,x)=>s+x.w,0),r=Math.random()*tot,i=0;for(;i<pool.length;i++){r-=pool[i].w;if(r<=0)break;}const x=pool.splice(Math.min(i,pool.length-1),1)[0];out.push({a:x.a,b:x.b});}return out;}
+const PTN={zero:0,um:1,uma:1,dois:2,duas:2,tres:3,'três':3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,treze:13,quatorze:14,catorze:14,quinze:15,dezesseis:16,dezessete:17,dezoito:18,dezenove:19,vinte:20,trinta:30,quarenta:40,cinquenta:50,sessenta:60,setenta:70,oitenta:80,noventa:90,cem:100,cento:100};
+function ptNum(t){t=String(t).toLowerCase();const m=t.match(/\d+/);if(m)return+m[0];let s=0,f=false;for(const w of t.split(/[\s-]+/)){if(w==='e')continue;if(w in PTN){s+=PTN[w];f=true;}}return f?s:null;}
+function listenNumber(onnum,onerr){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){onerr('nosr');return null;}let r;try{r=new SR();r.lang='pt-BR';r.maxAlternatives=5;r.onresult=e=>{for(const a of[...e.results[0]]){const n=ptNum(a.transcript);if(n!=null){onnum(n);return;}}onerr('nonum');};r.onerror=e=>onerr(e.error||'err');r.start();}catch(e){onerr('start');}return r;}
+function colorBox(b){return['#c7d2e0','#e5484d','#ff9f1c','#9bc53d','#1fb866'][b];}
+function masteryMap(){const g=h('div',{class:'map'},h('b',{},'×'),range(1,10).map(b=>h('b',{},b)));range(1,10).forEach(a=>{g.append(h('b',{},a));range(1,10).forEach(b=>g.append(h('span',{style:`background:${colorBox(boxOf(a,b))}`,title:`${a}×${b}`},a*b)));});return g;}
+function teachNodes(f){if(f.op){const p=valF(f);return[h('h2',{},'Vamos fixar essa! 🧠'),h('div',{class:'fq',style:'font-size:56px'},`${f.a} ${symF(f)} ${f.b} = ${p}`),h('div',{class:'ex',html:f.op==='+'?addHelp(f.a,f.b):subHelp(f.a,f.b)}),visual({type:f.op==='+'?'add':'sub',a:f.a,b:f.b})];}const p=f.a*f.b;return[h('h2',{},'Vamos fixar essa! 🧠'),h('div',{class:'fq',style:'font-size:56px'},`${f.a} × ${f.b} = ${p}`),h('div',{class:'ex',html:factHelp(f.a,f.b)+'<br>💡 '+(MULT_TRICK[f.b]||MULT_TRICK[f.a])}),visual({type:'array',a:f.a,b:f.b}),h('p',{},'Diga em voz alta 3 vezes: ',h('b',{},`"${f.a} vezes ${f.b} é ${p}"`))];}
+async function actFacts({mode,tables,count=10,op}){
+  running=true;
+  const queue=(op?genSum(op,tables[0],count):pickFacts(tables,count)).map(f=>({...f,rq:0}));const sum={ok:0,total:0,fast:0};
+  const q=h('div',{class:'fq'}),ans=h('div',{class:'fa'}),bar=h('i'),fb=h('div',{class:'fb'}),info=h('div',{class:'small'}),dots=h('div',{class:'dots',style:'justify-content:center;margin-bottom:8px'});
+  const ctl={digit:()=>{},back:()=>{}};
+  let micBtn=null;
+  if(mode==='oral'){micBtn=h('button',{class:'r',style:'margin-top:8px'},'🎤 Falar a resposta');ctl.extraLabel='';}
+  const title=op?(op==='+'?'⚡ Relâmpago de somas':'⚡ Relâmpago de subtrações'):{timed:'⚡ Tabuada relâmpago',oral:'🎤 Prova oral',learn:'🧩 Complete a tabuada'}[mode];
+  stage.replaceChildren(h('div',{class:'fcard'},h('h2',{},title),dots,q,ans,h('div',{class:'tbar',style:mode==='learn'?'display:none':''},bar),fb,info,micBtn,h('div',{style:'max-width:360px;margin:12px auto 0'},makePad(ctl))));
+  const unbind=bindKeys(ctl);
+  const askOne=f=>new Promise(res=>{
+    const exp=String(valF(f)),fa=factOf(f),limit=mode==='learn'?0:mode==='oral'?10000:(fa.box>=3?6500:10000);
+    let buf='',done=false,timer,t0=performance.now(),rec=null;
+    q.textContent=`${f.a} ${symF(f)} ${f.b} = ?`;ans.textContent='';fb.textContent='';
+    bar.style.transition='none';bar.style.width='100%';
+    if(limit){requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.transition=`width ${limit}ms linear`;bar.style.width='0%';}));timer=setTimeout(()=>fin({ok:false,timeout:true}),limit);}
+    if(mode==='oral'){say(f.op?`${f.a} ${f.op==='+'?'mais':'menos'} ${f.b}?`:`${f.a} vezes ${f.b}?`);info.textContent='Fale a resposta (ou digite). Se o microfone não funcionar, use o teclado.';}
+    function fin(r){if(done)return;done=true;clearTimeout(timer);try{rec&&rec.abort();}catch(e){}r.ms=performance.now()-t0;res(r);}
+    const check=v=>{ans.textContent=v;setTimeout(()=>fin({ok:String(v)===exp}),250);};
+    ctl.digit=d=>{if(done||buf.length>=exp.length)return;buf+=d;SFX.tap();ans.textContent=buf;if(buf.length===exp.length)check(buf);};
+    ctl.back=()=>{if(done)return;buf=buf.slice(0,-1);ans.textContent=buf;};
+    if(micBtn)micBtn.onclick=()=>{if(done)return;info.textContent='🎧 Ouvindo...';rec=listenNumber(n=>{if(!done){buf=String(n);check(buf);}},e=>{info.textContent=e==='nosr'||e==='not-allowed'||e==='service-not-allowed'?'Microfone indisponível aqui — fale em voz alta e digite a resposta.':'Não ouvi bem. Toque no microfone de novo ou digite.';});};
+  });
+  while(queue.length){
+    const f=queue.shift();sum.total++;
+    dots.replaceChildren(...range(1,count).map(i=>h('span',{class:'dot'+(i<sum.total?' d':i===sum.total?' c':'')})));
+    const r=await askOne(f),x=factOf(f);x.seen++;if(r.ok)SES.ok++;else SES.err++;
+    if(r.ok){sum.ok++;x.ok++;const fast=r.ms<4500;if(fast){x.box=Math.min(4,x.box+1);sum.fast++;}else x.box=Math.max(1,x.box);S.coins+=1;SFX.ok();addXp(1);fb.textContent=fast?'⚡ Rápido e certo!':'✔ Certo!';updHeader();await sleep(650);}
+    else{x.box=1;combo=0;updHeader();SFX.oops();{const sp=factSpeech(f,r);sayKid(sp);await modal([...teachNodes(f),replayBtn(sp)],r.timeout?'Tempo! Entendi 👍':'Entendi 👍');}if(f.rq<2){f.rq++;queue.splice(Math.min(queue.length,rnd(2,3)),0,f);}}
+    save();}
+  unbind();running=false;
+  const coins=sum.ok*2;S.coins+=coins;save();updHeader();confetti(25);SFX.win();
+  await modal([h('h2',{},'Tabuada concluída!'),h('div',{class:'big'},'🧠'),h('p',{},`Você acertou ${sum.ok} de ${sum.total} (${sum.fast} bem rápidas).`),h('p',{},`+${coins} 🪙 · As que você errou voltam logo para você fixar.`)],'Continuar');
+  checkTrophies();return sum;}
+async function actLearn(n){
+  running=true;let i=0;
+  await new Promise(res=>{
+    const lines=h('div',{style:'font-size:40px;text-align:left;display:inline-block;min-height:480px'});
+    const btn=h('button',{class:'g'},'Mostrar a próxima linha ➜');
+    const tip=h('div',{class:'ex'},'💡 '+MULT_TRICK[n]);
+    stage.replaceChildren(h('div',{class:'fcard'},h('h2',{},`Aprender a tabuada do ${n}`),h('p',{},'Leia cada linha em voz alta e depois toque no botão. Quando ela aparecer, repita sem olhar!'),tip,lines,h('div',{},btn)));
+    btn.onclick=()=>{if(i<10){i++;const t=`${n} × ${i} = ${n*i}`;lines.append(h('div',{},t));say(`${n} vezes ${i} é ${n*i}`);SFX.tap();if(i===10)btn.textContent='Agora vou testar você! 🚀';}else res();};
+  });
+  await actFacts({mode:'learn',tables:[n],count:10});}
+
+/* ============ intervalo divertido: balões ============ */
+function actBalloons(rounds=5,ops=['x','x','x','/']){
+  return new Promise(res=>{
+    running=true;let i=0,ok=0;
+    const q=h('div',{class:'fq'}),field=h('div',{class:'bfield'}),info=h('div',{class:'fb'});
+    stage.replaceChildren(h('div',{class:'fcard'},h('h2',{},'🎈 Intervalo divertido!'),h('p',{},'Estoure o balão com a resposta certa.'),q,field,info));
+    const COL=['#e5484d','#2f80ed','#1fb866','#ff9f1c','#7c5cff'];
+    const round=()=>{
+      if(i>=rounds){running=false;S.coins+=ok*2;save();updHeader();modal([h('h2',{},'Que divertido! 🎈'),h('p',{},`Você estourou ${ok} balões certos. +${ok*2} 🪙`)],'Continuar').then(()=>{checkTrophies();res();});return;}
+      i++;const op=pick(ops);let a=rnd(2,10),b=rnd(2,10),right,txt,cand;
+      if(op==='x'){right=a*b;txt=`${a} × ${b} = ?`;cand=[right+a,right-a,right+b,right-b,right+10,right-10,(a+1)*b];}
+      else if(op==='/'){right=b;txt=`${a*b} ÷ ${a} = ?`;cand=[b-1,b+1,b+2,b-2,a];}
+      else if(op==='+'){a=rnd(1,10);b=rnd(1,10);right=a+b;txt=`${a} + ${b} = ?`;cand=[right+1,right-1,right+2,right-2,right+10,right-10];}
+      else{a=rnd(5,20);b=rnd(1,a-1);right=a-b;txt=`${a} − ${b} = ?`;cand=[right+1,right-1,right+2,right-2,right+10,right-10];}
+      q.textContent=txt;say(txt);const opts=new Set([right]);
+      for(const c of shuffle(cand)){if(opts.size>=4)break;if(c>0&&c!==right)opts.add(c);}while(opts.size<4)opts.add(right+rnd(1,9));
+      field.replaceChildren();info.textContent='';let fin=false;
+      shuffle([...opts]).forEach((v,k)=>{const bl=h('button',{class:'balloon',style:`background:${COL[k]};animation-delay:${k*.3}s`},v);
+        bl.onclick=()=>{if(fin)return;if(v===right){fin=true;ok++;SES.ok++;S.t.balloons++;bl.classList.add('pop');SFX.pop();info.textContent='💥 '+PRAISE[rnd(0,PRAISE.length-1)];setTimeout(round,750);}else{bl.classList.remove('wob');void bl.offsetWidth;bl.classList.add('wob');SFX.oops();SES.err++;info.textContent='Quase! Tente outro balão 😉';}};
+        field.append(bl);});};
+    round();});}
+
+/* ============ simulados ============ */
+const NAMES_PROB={
+ mult:[(a,b)=>`Uma padaria faz ${a} fornadas com ${b} pães em cada fornada. Quantos pães foram feitos?`,(a,b)=>`Em um jardim há ${a} canteiros e cada canteiro tem ${b} flores. Quantas flores há no jardim?`,(a,b)=>`Uma caixa tem ${b} chocolates. Quantos chocolates há em ${a} caixas?`],
+ div:[(D,d)=>`${D} figurinhas serão divididas igualmente entre ${d} amigos. Quantas figurinhas cada amigo recebe?`,(D,d)=>`Uma professora tem ${D} lápis e guarda ${d} lápis em cada pote. Quantos potes ela usa?`]};
+function decomp(a,b){if(b>=10){const t=Math.floor(b/10)*10,u=b%10;return`${a} × ${b} = ${a} × ${t} + ${a} × ${u} = ${a*t} + ${a*u} = ${a*b}`;}if(a>=10){const parts=digs(a).map((d,i,arr)=>d*Math.pow(10,arr.length-1-i)).filter(x=>x>0);return`${parts.map(p=>`${p} × ${b} = ${p*b}`).join('; ')} → ${parts.map(p=>p*b).join(' + ')} = ${a*b}`;}return`${a} × ${b} = ${a*b}. ${factHelp(a,b)}`;}
+const qFact=kind=>{const a=rnd(2,10),b=rnd(2,10);return kind==='mult'?{t:'fact',text:`${a} × ${b} = ?`,fields:['Resposta'],ans:[a*b],expl:`${a} × ${b} = ${a*b}. ${factHelp(a,b)}`}:{t:'fact',text:`${a*b} ÷ ${a} = ?`,fields:['Resposta'],ans:[b],expl:`${a*b} ÷ ${a} = ${b}, porque ${a} × ${b} = ${a*b}.`};};
+const qMult=L=>{const[a,b]=genMult(L);return{t:'mult',a,b,text:`${a} × ${b} = ?`,fields:['Resultado'],ans:[a*b],expl:decomp(a,b)};};
+const qDiv=L=>{const[D,d]=genDiv(L),q=Math.floor(D/d),r=D%d;return{t:'div',a:D,b:d,text:`${D} ÷ ${d}`,fields:['Quociente','Resto'],ans:[q,r],expl:`${d} × ${q} = ${d*q}; ${D} − ${d*q} = ${r}. Prova real: ${q} × ${d}${r?' + '+r:''} = ${D}.`};};
+const qProb=(kind,big)=>{if(kind==='mult'){const a=big?rnd(12,30):rnd(3,9),b=big?rnd(3,6):rnd(3,9);return{t:'prob',text:pick(NAMES_PROB.mult)(a,b),fields:['Resposta'],ans:[a*b],expl:`Operação: ${a} × ${b} = ${a*b}.`};}
+  const d=rnd(3,9),q=rnd(3,12),D=d*q;return{t:'prob',text:pick(NAMES_PROB.div)(D,d),fields:['Resposta'],ans:[q],expl:`Operação: ${D} ÷ ${d} = ${q}, porque ${d} × ${q} = ${D}.`};};
+const qProbR=()=>{const d=rnd(3,8),D=d*rnd(4,9)+rnd(1,d-1);return{t:'prob',text:`${D} balas serão colocadas em saquinhos com ${d} balas cada. Quantos saquinhos ficam completos e quantas balas sobram?`,fields:['Saquinhos','Sobram'],ans:[Math.floor(D/d),D%d],expl:`${D} ÷ ${d} = ${Math.floor(D/d)} e resto ${D%d}. Prova real: ${Math.floor(D/d)} × ${d} + ${D%d} = ${D}.`};};
+const qFactAS=op=>{if(op==='+'){const a=rnd(1,9),b=rnd(1,10-a);return{t:'fact',text:`${a} + ${b} = ?`,fields:['Resposta'],ans:[a+b],expl:`${a} + ${b} = ${a+b}. ${addHelp(a,b)}`};}const a=rnd(3,10),b=rnd(1,a-1);return{t:'fact',text:`${a} − ${b} = ?`,fields:['Resposta'],ans:[a-b],expl:`${a} − ${b} = ${a-b}. ${subHelp(a,b)}`};};
+const qAdd=L=>{const[a,b]=genAdd(L);return{t:'add',a,b,text:`${a} + ${b} = ?`,fields:['Resultado'],ans:[a+b],expl:`${a} + ${b} = ${a+b}. Some coluna por coluna, começando pelas unidades, e não esqueça o "vai-um".`};};
+const qSub=L=>{const[a,b]=genSub(L);return{t:'sub',a,b,text:`${a} − ${b} = ?`,fields:['Resultado'],ans:[a-b],expl:`${a} − ${b} = ${a-b}. Prova real: ${a-b} + ${b} = ${a}.`};};
+const qProbAS=(op,big)=>{if(op==='add'){const a=big?rnd(120,480):rnd(8,30),b=big?rnd(120,480):rnd(5,25);const T=[`Uma loja tinha ${a} balões e recebeu mais ${b}. Quantos balões a loja tem agora?`,`Em um ônibus há ${a} crianças. Entraram mais ${b}. Quantas crianças há agora?`,`Eu tenho ${a} figurinhas e meu amigo tem ${b}. Quantas figurinhas temos juntos?`];return{t:'prob',text:pick(T),fields:['Resposta'],ans:[a+b],expl:`Operação: ${a} + ${b} = ${a+b}.`};}
+  const a=big?rnd(300,900):rnd(20,50),b=big?rnd(101,a-50):rnd(5,a-5);const T=[`Havia ${a} biscoitos em um pote e foram comidos ${b}. Quantos biscoitos sobraram?`,`Uma turma tem ${a} alunos e ${b} faltaram hoje. Quantos alunos vieram?`,`Um livro tem ${a} páginas e eu já li ${b}. Quantas páginas faltam ler?`];return{t:'prob',text:pick(T),fields:['Resposta'],ans:[a-b],expl:`Operação: ${a} − ${b} = ${a-b}.`};};
+const EXAMS={
+ s5:{title:'Simulado 5 · Adição e subtração (iniciante)',min:15,build:()=>[qFactAS('+'),qFactAS('+'),qFactAS('-'),qFactAS('-'),qAdd(1),qSub(1),qAdd(2),qSub(2),qProbAS('add'),qProbAS('sub')]},
+ s6:{title:'Simulado 6 · Adição e subtração (desafio)',min:25,build:()=>[qAdd(3),qAdd(3),qSub(3),qSub(3),qAdd(4),qAdd(4),qSub(4),qSub(4),qProbAS('add',true),qProbAS('sub',true)]},
+ mini2:{title:'Mini-prova do chefão',min:8,build:()=>[qFactAS('+'),qFactAS('-'),qAdd(2),qSub(2),qProbAS('add')]},
+ s1:{title:'Simulado 1 · Multiplicação',min:15,build:()=>[...range(1,4).map(()=>qFact('mult')),...range(1,3).map(()=>qMult(1)),...range(1,2).map(()=>qMult(2)),qProb('mult')]},
+ s2:{title:'Simulado 2 · Divisão',min:15,build:()=>[...range(1,3).map(()=>qFact('div')),...range(1,3).map(()=>qDiv(1)),...range(1,3).map(()=>qDiv(2)),qProb('div')]},
+ s3:{title:'Simulado 3 · Prova mista',min:20,build:()=>[qFact('mult'),qFact('mult'),qFact('div'),qFact('div'),qMult(2),qMult(2),qMult(3),qDiv(2),qDiv(3),qProb('mult')]},
+ s4:{title:'Simulado 4 · Desafio',min:25,build:()=>[qFact('mult'),qMult(3),qMult(3),qMult(4),qMult(4),qDiv(3),qDiv(3),qDiv(4),qProb('mult',true),qProbR()]},
+ mini:{title:'Mini-prova do chefão',min:8,build:()=>[qFact('mult'),qFact('mult'),qMult(2),qDiv(2),qProb('div')]}};
+function scratch(){const c=h('canvas',{class:'scratch',width:1000,height:240});const g=c.getContext('2d');g.lineWidth=4;g.lineCap='round';g.strokeStyle='#2f80ed';let d=false;const pos=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*c.width/r.width,(e.clientY-r.top)*c.height/r.height];};
+  c.addEventListener('pointerdown',e=>{d=true;const[x,y]=pos(e);g.beginPath();g.moveTo(x,y);try{c.setPointerCapture(e.pointerId);}catch(_){}});c.addEventListener('pointermove',e=>{if(!d)return;const[x,y]=pos(e);g.lineTo(x,y);g.stroke();});const up=()=>d=false;c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);return{el:c,clear:()=>g.clearRect(0,0,c.width,c.height)};}
+async function actExam(id){
+  const cfg=EXAMS[id],Q=cfg.build();running=true;
+  const A=Q.map(q=>q.fields.map(()=>''));let qi=0,fi=0,left=cfg.min*60,over=false;
+  const pads=Q.map(()=>scratch());
+  return new Promise(resolve=>{
+    const head=h('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap'}),qbox=h('div',{class:'qcard'}),sc=h('div',{});
+    const prev=h('button',{class:'w'},'⬅ Anterior'),nextB=h('button',{class:'g'},'Próxima ➜');
+    const ctl={digit:d=>{if(A[qi][fi].length<4){A[qi][fi]+=d;SFX.tap();draw();}},back:()=>{A[qi][fi]=A[qi][fi].slice(0,-1);draw();}};
+    function draw(){
+      head.replaceChildren(h('h2',{style:'margin:0'},`${cfg.title} — questão ${qi+1} de ${Q.length}`),h('div',{class:'chip'},'⏳ '+fmtT(left)));
+      const q=Q[qi];qbox.replaceChildren(h('div',{class:'qtext'},q.text),h('div',{},q.fields.map((lab,k)=>h('div',{class:'fld'+(k===fi?' cur':''),onclick:()=>{fi=k;draw();}},h('div',{},A[qi][k]),lab))),h('div',{class:'small'},'Use o rascunho abaixo para fazer a conta com o dedo ✏️'));
+      sc.replaceChildren(pads[qi].el,h('div',{},h('button',{class:'w',style:'min-height:40px;margin-top:6px',onclick:()=>pads[qi].clear()},'Limpar rascunho')));
+      prev.disabled=qi===0;nextB.textContent=qi===Q.length-1?'Entregar a prova ✅':'Próxima ➜';}
+    prev.onclick=()=>{qi--;fi=0;draw();};
+    nextB.onclick=()=>{if(qi<Q.length-1){qi++;fi=0;draw();}else finish();};
+    stage.replaceChildren(h('div',{},head,h('div',{class:'nbgrid',style:'margin-top:10px'},h('div',{},qbox,h('div',{style:'margin-top:10px'},sc),h('div',{style:'display:flex;gap:10px;margin-top:10px;justify-content:space-between'},prev,nextB)),h('div',{class:'side'},h('div',{class:'coach'},mascot('sm'),h('div',{class:'bubble'},'Modo prova: sem dicas durante a prova. Respire fundo, faça com calma. Depois eu te mostro tudo passo a passo! 💪')),makePad(ctl)))));
+    const unbind=bindKeys(ctl);draw();
+    const tm=setInterval(()=>{left--;if(left<=0){clearInterval(tm);if(!over){toast('⏰ O tempo acabou — vamos entregar!');finish();}}else{const c=head.querySelector('.chip');if(c)c.textContent='⏳ '+fmtT(left);}},1000);
+    async function finish(){if(over)return;over=true;clearInterval(tm);unbind();
+      const res=Q.map((q,i)=>({q,ok:q.ans.every((v,k)=>A[i][k]!==''&&+A[i][k]===v),mine:A[i]}));const score=res.filter(r=>r.ok).length,total=Q.length;SES.ok+=score;SES.err+=total-score;
+      const out10=Math.round(score/total*10);S.t.exams++;S.t.bestExam=Math.max(S.t.bestExam,out10);S.exams.push({id,score,total,d:new Date().toISOString().slice(0,10)});
+      const stars=out10>=9?3:out10>=7?2:1,coins=score*2+stars*3;S.coins+=coins;S.stars+=stars;addXp(10);save();updHeader();confetti(out10>=7?50:20);SFX.win();
+      const wrong=res.filter(r=>!r.ok);
+      running=false;
+      await modal([h('h2',{},`Você acertou ${score} de ${total}!`),h('div',{class:'big'},'⭐'.repeat(stars)+'☆'.repeat(3-stars)),h('p',{},score===total?'Prova perfeita! 🏆':wrong.length<=3?'Muito bem! Veja só o que revisar.':'Você fez a prova até o fim — isso já é uma vitória! Vamos ver cada questão e treinar as que ficaram para trás.'),h('p',{},`+${coins} 🪙`)],'Ver correção');
+      await modal([h('h2',{},'Correção'),res.map((r,i)=>h('div',{class:'rv '+(r.ok?'ok':'no')},h('div',{style:'font-size:26px'},r.ok?'✅':'🔶'),h('div',{},h('b',{},`${i+1}. ${r.q.text}`),h('div',{class:'small'},r.ok?'Você acertou!':`Sua resposta: ${r.mine.map(x=>x||'—').join(' / ')} · Correto: ${r.q.ans.join(' / ')}`),r.ok?null:h('div',{class:'small'},'📘 '+r.q.expl))))],'Fechar');
+      const redo=wrong.filter(r=>['mult','div','add','sub'].includes(r.q.t));
+      if(redo.length&&await new Promise(rs=>{modal([h('h2',{},'Quer treinar as que errou?'),h('p',{},`São ${redo.length} conta(s). Vou mostrar passo a passo no caderno.`)],null).then(()=>{});const o=$('#overlay');o.firstChild.append(h('button',{class:'g',onclick:()=>{o.hidden=true;o.replaceChildren();rs(true);}},'Sim, vamos!'),h('button',{class:'w',onclick:()=>{o.hidden=true;o.replaceChildren();rs(false);}},'Agora não'));})){
+        for(let k=0;k<redo.length;k++){const q=redo[k].q;const ex=Object.assign({kind:q.t,L:2,a:q.a,b:q.b,errTotal:0},BLD[q.t](q.a,q.b));const r=await runExercise(ex,{idx:k,count:redo.length,L:1});bumpStats(ex,r);await rewardModal(r);}}
+      checkTrophies();unbind();resolve({score,total});}
+  });}
+function screenExams(){running=false;
+  stage.replaceChildren(h('h1',{},'📝 Simulados'),h('p',{},'Provas de treino com tempo, rascunho no dedo e correção passo a passo no final. Sem dicas durante a prova, como na escola!'),
+    h('div',{class:'levels'},['s1','s2','s3','s4','s5','s6'].map(id=>{const c=EXAMS[id];const best=S.exams.filter(e=>e.id===id).reduce((m,e)=>Math.max(m,e.score),0);return h('div',{class:'lv'},h('div',{class:'n',style:'font-size:30px'},c.title.split('·')[0]),h('div',{class:'small'},c.title.split('·')[1]+' · 10 questões · '+c.min+' min'),h('div',{class:'med',style:'font-size:20px'},best?`Melhor nota: ${best}/10`:''),h('button',{class:'g',onclick:async()=>{await actExam(id);screenExams();}},'Começar'));})));}
+
+/* ============ tela de tabuada ============ */
+let selTables=range(1,10);
+function screenTabuada(){running=false;
+  const chips=h('div',{class:'chips'},range(1,10).map(n=>h('button',{class:selTables.includes(n)?'on':'',onclick:e=>{selTables=selTables.includes(n)?selTables.filter(x=>x!==n):[...selTables,n].sort((a,b)=>a-b);screenTabuada();}},n)));
+  const learn=h('div',{class:'chips'},range(1,10).map(n=>h('button',{class:'w',style:'background:#fff',onclick:async()=>{await actLearn(n);screenTabuada();}},`×${n}`)));
+  const t=selTables.length?selTables:range(1,10);
+  stage.replaceChildren(h('h1',{},'🎤 Tabuada'),h('p',{},'Aprender, treinar contra o relógio e fazer a prova oral. As contas que você erra voltam logo, e as que você já sabe aparecem menos — assim a memória fixa!'),
+    h('div',{class:'fgrid'},
+      h('div',{class:'card'},h('h3',{},'1) Aprender uma tabuada'),h('p',{class:'small'},'Leitura em voz alta, truque de memória e teste sem tempo.'),learn),
+      h('div',{class:'card'},h('h3',{},'2) Escolha as tabuadas para treinar'),chips,h('div',{style:'display:flex;gap:10px;flex-wrap:wrap;justify-content:center'},h('button',{class:'o',onclick:async()=>{await actFacts({mode:'timed',tables:t,count:10});screenTabuada();}},'⚡ Relâmpago (10)'),h('button',{class:'r',onclick:async()=>{await actFacts({mode:'oral',tables:t,count:10});screenTabuada();}},'🎤 Prova oral (10)')))),
+    h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'Mapa da memória'),h('div',{class:'small'},'Cinza = ainda não treinou · Vermelho = precisa fixar · Laranja = quase · Verde = já sabe de cabeça'),masteryMap()));}
+
+/* ============ missão de 1 hora ============ */
+async function startMission(track='md'){
+  const t0=Date.now();let paused=false;
+  const chest={e:'🎁',t:'Baú do tesouro',m:1,run:async()=>{S.coins+=30;S.t.missions++;save();updHeader();confetti(80);SFX.win();await modal([h('h2',{},'Baú do tesouro! 🎁'),h('div',{class:'big'},'🏆'),h('p',{},`Missão cumprida em ${Math.round((Date.now()-t0)/60000)} minutos. Você ganhou +30 🪙 e o troféu da missão!`)],'Que legal!');checkTrophies();}};
+  let plan;
+  if(track==='as'){const la=firstOpen('add'),ls=firstOpen('sub'),mx=S.lvl.add[0].done?20:10;plan=[
+   {e:'⚡',t:'Aquecimento: relâmpago de somas',m:3,run:()=>actFacts({mode:'timed',tables:[mx],count:8,op:'+'})},
+   {e:'➕',t:'Caderno de adição',m:8,run:()=>actNotebook('add',la,3)},
+   {e:'🎈',t:'Intervalo divertido: balões',m:2,run:()=>actBalloons(5,['+','+','-'])},
+   {e:'➖',t:'Caderno de subtração',m:9,run:()=>actNotebook('sub',ls,3)},
+   {e:'⚡',t:'Relâmpago de subtrações',m:3,run:()=>actFacts({mode:'timed',tables:[mx],count:8,op:'-'})},
+   {e:'➕',t:'Mais adição',m:8,run:()=>actNotebook('add',la,3)},
+   {e:'🎈',t:'Balões de novo',m:2,run:()=>actBalloons(5,['-','-','+'])},
+   {e:'➖',t:'Mais subtração',m:9,run:()=>actNotebook('sub',ls,3)},
+   {e:'📝',t:'Mini-prova do chefão',m:6,run:()=>actExam('mini2')},chest];}
+  else{const lm=firstOpen('mult'),ld=firstOpen('div');plan=[
+   {e:'⚡',t:'Aquecimento: tabuada relâmpago',m:3,run:()=>actFacts({mode:'timed',tables:range(1,10),count:8})},
+   {e:'✖️',t:'Caderno de multiplicação',m:9,run:()=>actNotebook('mult',lm,3)},
+   {e:'🎈',t:'Intervalo divertido: balões',m:2,run:()=>actBalloons(5)},
+   {e:'➗',t:'Caderno de divisão',m:10,run:()=>actNotebook('div',ld,3)},
+   {e:'🎤',t:'Tabuada oral',m:4,run:()=>actFacts({mode:'oral',tables:range(1,10),count:8})},
+   {e:'✖️',t:'Mais multiplicação',m:8,run:()=>actNotebook('mult',lm,3)},
+   {e:'🎈',t:'Balões de novo',m:2,run:()=>actBalloons(5)},
+   {e:'➗',t:'Mais divisão',m:9,run:()=>actNotebook('div',ld,3)},
+   {e:'📝',t:'Mini-prova do chefão',m:6,run:()=>actExam('mini')},chest];}
+  for(let i=0;i<plan.length;i++){
+    running=true;
+    if(!paused&&Date.now()-t0>30*60000){paused=true;await pause();}
+    await new Promise(res=>{stage.replaceChildren(h('div',{class:'card',style:'text-align:center'},mascot(),h('h2',{},`Missão ${i+1} de ${plan.length}`),h('div',{style:'font-size:56px'},plan[i].e),h('h2',{},plan[i].t),h('p',{class:'small'},`Cerca de ${plan[i].m} minuto(s)`),h('div',{class:'tbar'},h('i',{style:`width:${i/plan.length*100}%;background:var(--purple)`})),h('button',{class:'g',onclick:res},'Vamos! 🚀')));});
+    await plan[i].run();}
+  screenHome();}
+function pause(){return new Promise(res=>{let s=20;const b=h('button',{class:'g',disabled:'true'},`Voltar em ${s}s`);const o=$('#overlay');o.hidden=false;o.replaceChildren(h('div',{class:'modal'},h('h2',{},'Pausa para o corpo! 🧘'),h('div',{class:'big'},'💧'),h('p',{},'Beba água, alongue os braços e olhe para longe por alguns segundos. O cérebro aprende melhor depois de uma pausa.'),b));
+  const iv=setInterval(()=>{s--;if(s<=0){clearInterval(iv);b.disabled=false;b.removeAttribute('disabled');b.textContent='Voltar ao jogo ➜';b.onclick=()=>{o.hidden=true;o.replaceChildren();res();};}else b.textContent=`Voltar em ${s}s`;},1000);});}
+
+/* ============ prêmios ============ */
+function screenRewards(){running=false;
+  stage.replaceChildren(h('h1',{},'🏆 Prêmios do Zeca'),
+    h('div',{class:'fgrid'},
+      h('div',{class:'card'},h('h3',{},'Loja do Zeca (🪙 '+S.coins+')'),h('p',{class:'small'},'Preço fixo, sem sorteio e sem compra com dinheiro de verdade.'),h('div',{class:'levels',style:'grid-template-columns:repeat(auto-fit,minmax(140px,1fr))'},SHOP.map(it=>{const own=S.owned.includes(it.id),eq=S.equip===it.id;return h('div',{class:'lv'},h('div',{style:'font-size:44px'},it.e),h('div',{class:'small'},it.n),h('button',{class:own?(eq?'w':'p'):'o',onclick:()=>{if(own){S.equip=eq?'':it.id;}else if(S.coins>=it.c){S.coins-=it.c;S.spent+=it.c;S.owned.push(it.id);S.equip=it.id;SFX.win();}else{toast('Faltam '+(it.c-S.coins)+' moedas — continue jogando!');return;}save();updHeader();screenRewards();}},own?(eq?'Tirar':'Usar'):`${it.c} 🪙`));}))),
+      h('div',{class:'card',style:'text-align:center'},h('h3',{},'Seu Zeca'),mascot(),h('p',{},`Nível ${lvlOf(S.xp)} · ${S.stars} estrelas`))),
+    h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'Troféus'),h('div',{class:'levels',style:'grid-template-columns:repeat(auto-fit,minmax(170px,1fr))'},TROPHIES.map(t=>{const has=S.trophies.includes(t.id);return h('div',{class:'lv'+(has?'':' locked')},h('div',{style:'font-size:40px'},has?t.e:'🔒'),h('b',{},t.n),h('div',{class:'small'},t.d));}))));}
+
+/* ============ painel dos pais ============ */
+async function sha(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}catch(e){let k=5381;for(const c of t)k=((k<<5)+k+c.charCodeAt(0))|0;return'x'+k;}}
+const pwdInput=ph=>h('input',{type:'password',placeholder:ph,autocomplete:'off',style:'font-size:24px;padding:10px;border-radius:14px;border:3px solid #cfe0f3;width:260px;text-align:center;margin:6px;font-family:inherit'});
+const gateCard=(...k)=>stage.replaceChildren(h('div',{class:'card',style:'text-align:center;max-width:520px;margin:20px auto'},...k));
+function screenParents(){running=false;const P=rd(PK);if(P)askPwd(P);else mathGate(()=>setPwd(true),'Primeiro acesso: prove que você é adulto');}
+function mathGate(onOk,title){const a=rnd(13,29),b=rnd(12,19);const inp=h('input',{type:'number',style:'font-size:28px;padding:10px;border-radius:14px;border:3px solid #cfe0f3;width:160px;text-align:center',inputmode:'numeric'});
+  gateCard(h('h2',{},'Área dos pais e professores 🔒'),h('p',{},title||'Para entrar, resolva (adultos):'),h('div',{class:'fq',style:'font-size:44px'},`${a} × ${b} = ?`),inp,h('div',{},h('button',{class:'g',onclick:()=>{if(+inp.value===a*b)onOk();else{toast('Resposta incorreta');inp.value='';}}},'Continuar')));}
+function setPwd(first){const p1=pwdInput('Nova senha (mín. 4)'),p2=pwdInput('Repita a senha');
+  gateCard(h('h2',{},first?'Crie uma senha 🔑':'Nova senha 🔑'),h('p',{},first?'Nos próximos acessos você entra só com a senha. Não use a data de nascimento da criança.':'Escolha a nova senha.'),p1,h('br'),p2,h('div',{},h('button',{class:'g',onclick:async()=>{if(p1.value.length<4){toast('A senha precisa ter 4 ou mais caracteres');return;}if(p1.value!==p2.value){toast('As senhas não são iguais');return;}const salt=Math.random().toString(36).slice(2)+Date.now().toString(36);wr(PK,{salt,hash:await sha(salt+p1.value)});toast('✅ Senha salva neste aparelho');panelParents();}},'Salvar senha'),h('button',{class:'w',onclick:screenHome},'Cancelar')));}
+function askPwd(P){const inp=pwdInput('Senha');const go=async()=>{if(await sha(P.salt+inp.value)===P.hash)panelParents();else{toast('Senha incorreta');inp.value='';}};inp.addEventListener('keydown',e=>{if(e.key==='Enter')go();});
+  gateCard(h('h2',{},'Área dos pais e professores 🔒'),h('p',{},'Digite a senha:'),inp,h('div',{},h('button',{class:'g',onclick:go},'Entrar')),h('p',{class:'small'},h('a',{href:'#',style:'color:var(--blue)',onclick:e=>{e.preventDefault();mathGate(()=>setPwd(false),'Esqueceu a senha? Resolva para criar uma nova:');}},'Esqueci a senha')));}
+const META='zeca-math-meta';
+function buildBackup(){save();const profiles={};IX.ids.forEach(id=>{const d=id===IX.active?S:rd(keyOf(id));if(d)profiles[id]=d;});return JSON.stringify({app:'zeca-math',v:1,exported:new Date().toISOString(),idx:IX,profiles,parent:rd(PK)});}
+function parseBackup(txt){let o;try{o=JSON.parse(txt);}catch(e){return{err:'Arquivo ou código inválido.'};}
+  if(!o||o.app!=='zeca-math'||!o.idx||!Array.isArray(o.idx.ids)||!o.profiles||typeof o.profiles!=='object')return{err:'Isto não é um backup do Zeca.'};
+  const ids=o.idx.ids.filter(id=>/^p[a-z0-9]*$/i.test(id)&&o.profiles[id]&&typeof o.profiles[id].name==='string');if(!ids.length)return{err:'O backup não tem jogadores.'};
+  return{o,ids};}
+function applyBackup({o,ids}){NOSAVE=true;ids.forEach(id=>wr(keyOf(id),o.profiles[id]));wr(IDX,{active:ids.includes(o.idx.active)?o.idx.active:ids[0],ids});
+  if(o.parent&&typeof o.parent.hash==='string'&&typeof o.parent.salt==='string')wr(PK,{salt:o.parent.salt,hash:o.parent.hash});location.reload();}
+async function askRestore(txt){const b=parseBackup(txt);if(b.err){toast(b.err);return;}const ok=await confirmModal('Restaurar o backup? Isso SUBSTITUI o progresso e a senha deste aparelho pelos do backup.','Sim, restaurar','Cancelar');if(ok)applyBackup(b);}
+function backupCard(){
+  const meta=rd(META)||{},last=meta.lastBackup?new Date(meta.lastBackup).toLocaleDateString('pt-BR'):'nunca';
+  const area=h('textarea',{placeholder:'Cole aqui o código do backup',style:'width:100%;height:70px;border-radius:12px;border:3px solid #cfe0f3;padding:8px;font-size:14px'});
+  const file=h('input',{type:'file',accept:'.json,application/json'});file.onchange=()=>{const f=file.files[0];if(!f)return;const r=new FileReader();r.onload=()=>askRestore(String(r.result));r.readAsText(f);};
+  return h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'💾 Backup do progresso'),
+    h('p',{},`Guarde uma cópia do progresso, das estrelas e da senha para trocar de tablet ou se algo for apagado. Último backup: ${last}.`),
+    h('div',{style:'display:flex;gap:10px;flex-wrap:wrap'},
+      h('button',{class:'g',onclick:()=>{try{const blob=new Blob([buildBackup()],{type:'application/json'});const a=h('a',{href:URL.createObjectURL(blob),download:'zeca-backup-'+new Date().toISOString().slice(0,10)+'.json'});document.body.append(a);a.click();a.remove();wr(META,{lastBackup:Date.now()});toast('Backup gerado (veja a pasta de downloads)');}catch(e){toast('Não foi possível baixar. Use "Copiar código".');}}},'⬇ Baixar arquivo de backup'),
+      h('button',{class:'o',onclick:async()=>{const t=buildBackup();try{await navigator.clipboard.writeText(t);wr(META,{lastBackup:Date.now()});toast('Código copiado! Cole em um lugar seguro.');}catch(e){area.value=t;area.select();toast('Selecione e copie o código da caixa abaixo.');}}},'📋 Copiar código do backup')),
+    h('h3',{style:'margin-top:16px'},'Restaurar'),h('p',{class:'small'},'Escolha o arquivo de backup ou cole o código e toque em Restaurar.'),file,h('div',{style:'margin-top:8px'},area),h('button',{class:'p',style:'margin-top:8px',onclick:()=>area.value.trim()?askRestore(area.value):toast('Cole o código primeiro')},'Restaurar'),
+    h('p',{class:'small'},'O arquivo contém o progresso e a senha (em forma criptografada). Guarde-o só com os responsáveis.'));}
+let DEFERRED=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DEFERRED=e;});
+function installCard(){const on=('serviceWorker' in navigator)&&navigator.serviceWorker.controller;
+  return h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'📲 Instalar e usar sem internet'),
+    h('p',{},on?'✅ Modo offline ativo: o jogo já está guardado neste aparelho.':'O modo offline liga depois que o jogo é aberto uma vez, com internet, pelo endereço publicado (não funciona na página de teste do Claude).'),
+    DEFERRED?h('button',{class:'g',onclick:async()=>{try{DEFERRED.prompt();await DEFERRED.userChoice;}catch(e){}DEFERRED=null;}},'Instalar agora'):null,
+    h('p',{class:'small'},'Android (Chrome): menu ⋮ → Instalar app ou Adicionar à tela inicial. iPad (Safari): botão Compartilhar → Adicionar à Tela de Início. Use sempre o mesmo ícone para não separar o progresso.'));}
+function voiceCard(){const L=ptVoices();const sel=h('select',{style:'font-size:18px;padding:8px;border-radius:12px;max-width:100%'},h('option',{value:''},'Automática (melhor voz disponível)'),L.map(v=>h('option',S.voiceName===v.name?{value:v.name,selected:'selected'}:{value:v.name},v.name)));sel.onchange=()=>{S.voiceName=sel.value;save();};
+  return h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'🗣️ Voz do Zeca'),
+    L.length?h('div',{},sel,h('div',{style:'margin-top:8px'},h('button',{class:'g',onclick:()=>speak('Oi! Eu sou o Zeca. Vamos aprender juntos?',true)},'🔊 Testar a voz'))):h('p',{},'Este aparelho não tem voz em português do Brasil instalada, então as explicações aparecem só escritas.'),
+    h('p',{class:'small'},'A qualidade da voz depende do aparelho. Prefira vozes em português do Brasil marcadas como "Natural", "Online" ou "Aprimorada". Se não houver, instale uma nas configurações de voz/acessibilidade do tablet e abra o jogo de novo.'));}
+function panelParents(){
+  const rows=['add','sub','mult','div'].flatMap(k=>range(1,4).map(L=>{const s=S.stats[k+L];return h('tr',{},h('td',{},KNAME[k]+' · N'+L),h('td',{},s?s.ex:0),h('td',{},s?Math.round(s.clean/s.ex*100)+'%':'—'),h('td',{},s?(s.err/s.ex).toFixed(1):'—'),h('td',{},s?s.assist:'—'));}));
+  const KN={adig:'somar a coluna',sdig:'subtrair a coluna',borrow:'emprestar da casa vizinha',mdig:'multiplicar um dígito',carry:'"vai-um"',lead:'escrever a dezena final',sum:'somar as colunas',q:'achar o quociente',p:'multiplicar o quociente pelo divisor',r:'subtrair (resto)'};
+  const ek=Object.entries(S.errKinds).sort((x,y)=>y[1]-x[1]).slice(0,3).map(([k,v])=>`${KN[k]||k} (${v})`);
+  const weak=Object.entries(S.facts).filter(([k,v])=>v.seen>0&&v.box<=1).sort((x,y)=>(y[1].seen-y[1].ok)-(x[1].seen-x[1].ok)).slice(0,6).map(([k])=>k.replace('x',' × '));
+  stage.replaceChildren(h('h1',{},'👨‍👩‍👧 Painel dos pais e professores'),h('div',{style:'margin-bottom:12px'},h('button',{class:'p',onclick:screenSessions},'📊 Resumo das últimas sessões'),' ',h('button',{class:'w',onclick:()=>setPwd(false)},'🔑 Trocar senha')),
+    h('div',{class:'fgrid'},
+      h('div',{class:'card'},h('h3',{},'Resumo'),h('p',{},`Tempo de jogo acumulado: ${Math.round(S.ms/60000)} min · Exercícios no caderno: ${S.t.ex} · Simulados: ${S.t.exams} (melhor nota ${S.t.bestExam}/10) · Tabuadas dominadas: ${masteredTables()}/10`),
+        h('h3',{},'Onde mais precisa de apoio'),h('p',{},ek.length?'Passos com mais erros: '+ek.join('; ')+'.':'Ainda sem dados suficientes.'),h('p',{},weak.length?'Contas da tabuada para reforçar: '+weak.join(', ')+'.':'Nenhuma conta da tabuada marcada como fraca ainda.')),
+      h('div',{class:'card'},h('h3',{},'Privacidade e segurança'),h('p',{class:'small'},'Sem conta, sem anúncios, sem rastreadores e sem compras. Apelido, progresso e a senha (guardada só como código criptografado) ficam somente neste aparelho. Nenhum dado é enviado para a internet. Você pode apagar o progresso abaixo.'),h('button',{class:'r',onclick:async()=>{if(await confirmModal('Apagar o progresso de '+S.name+'?','Sim, apagar','Cancelar')){NOSAVE=true;try{localStorage.removeItem(KEY);}catch(e){}IX.ids=IX.ids.filter(i=>i!==IX.active);if(!IX.ids.length)IX.ids=['p1'];IX.active=IX.ids[0];wr(IDX,IX);location.reload();}}},'Apagar o progresso deste jogador'))),
+    voiceCard(),backupCard(),installCard(),
+    h('div',{class:'card',style:'margin-top:14px;overflow:auto'},h('h3',{},'Desempenho por nível'),h('table',{class:'st'},h('tr',{},['Nível','Exercícios','Sem erro','Erros/exerc.','Com ajuda'].map(x=>h('th',{},x))),rows)),
+    h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'Mapa da tabuada'),masteryMap()));}
+
+/* ============ resumo de sessões ============ */
+function screenSessions(){running=false;const ss=S.sessions.slice(-10).reverse(),earned=S.coins+S.spent;
+  const tot=ss.reduce((a,x)=>({sec:a.sec+x.sec,ok:a.ok+x.ok,err:a.err+x.err}),{sec:0,ok:0,err:0});const pct=(o,e)=>o+e?Math.round(o/(o+e)*100)+'%':'—';
+  stage.replaceChildren(h('button',{class:'w',onclick:panelParents},'⬅ Voltar ao painel'),h('h1',{},'📊 Últimas sessões de '+S.name),
+    h('div',{class:'card'},h('h3',{},'Acumulado'),h('p',{},`⭐ ${S.stars} estrelas · 🪙 ${earned} moedas ganhas (${S.coins} na carteira) · Nível ${lvlOf(S.xp)} · Tempo total ${Math.round(S.ms/60000)} min`),
+      ss.length?h('p',{},`${ss.length>1?'Nas últimas '+ss.length+' sessões':'Na última sessão'}: ${Math.round(tot.sec/60)} min dedicados e ${pct(tot.ok,tot.err)} de acertos.`):null),
+    h('div',{class:'card',style:'margin-top:14px;overflow:auto'},h('p',{class:'small'},'Uma sessão começa quando o jogo é aberto. "Acertos" contam cada passo da conta, tabuada, balão e questão de prova.'),
+      ss.length?h('table',{class:'st'},h('tr',{},['Data e hora','Tempo','% de acertos','Acertos / total','⭐ ganhas','🪙 ganhas'].map(x=>h('th',{},x))),ss.map(x=>h('tr',{},h('td',{},new Date(x.t).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})),h('td',{},x.sec>=60?Math.round(x.sec/60)+' min':x.sec+' s'),h('td',{},h('b',{},pct(x.ok,x.err))),h('td',{},`${x.ok} / ${x.ok+x.err}`),h('td',{},'+'+x.stars),h('td',{},'+'+x.coins)))):h('p',{},'Ainda sem sessões registradas. Jogue um pouco e volte aqui!')));}
+/* ============ pódio e jogadores ============ */
+let rankBy='stars';
+const allPlayers=()=>IX.ids.map(id=>{const d=id===IX.active?S:(rd(keyOf(id))||{});return{id,name:d.name||'Jogador',stars:d.stars||0,earned:(d.coins||0)+(d.spent||0),lvl:lvlOf(d.xp||0)};});
+function switchPlayer(id){save();IX.active=id;wr(IDX,IX);location.reload();}
+function newPlayer(name){name=(name||'').trim().slice(0,14);if(!name){toast('Digite um apelido');return;}if(IX.ids.length>=8){toast('Máximo de 8 jogadores');return;}save();const id='p'+Date.now().toString(36);IX.ids.push(id);IX.active=id;wr(IDX,IX);wr(keyOf(id),Object.assign(defaults(),{id,name}));location.reload();}
+function screenPodium(){running=false;
+  const L=allPlayers().sort((a,b)=>rankBy==='stars'?(b.stars-a.stars||b.earned-a.earned):(b.earned-a.earned||b.stars-a.stars));
+  const val=p=>rankBy==='stars'?p.stars:p.earned,icon=rankBy==='stars'?'⭐':'🪙';
+  const H=[190,140,105],COL=['#f5b301','#9aa7b5','#c9803f'],MED=['🥇','🥈','🥉'];
+  const top=L.slice(0,3),order=top.length>=3?[top[1],top[0],top[2]]:top.length===2?[top[1],top[0]]:[top[0]];
+  const pod=h('div',{class:'podium'},order.map(p=>{const r=L.indexOf(p);return h('div',{class:'pcol'+(p.id===IX.active?' me':'')},h('div',{class:'pname'},p.name),h('div',{class:'pval'},`${icon} ${val(p)}`),h('div',{class:'pbar',style:`height:${H[r]}px;background:${COL[r]}`},MED[r]));}));
+  const tab=(k,t)=>h('button',{class:rankBy===k?'p':'w',onclick:()=>{rankBy=k;screenPodium();}},t);
+  stage.replaceChildren(h('h1',{},'🏅 Pódio dos campeões'),h('div',{class:'chips'},tab('stars','⭐ Estrelas'),tab('coins','🪙 Moedas ganhas')),
+    h('div',{class:'card'},pod,L.length<2?h('p',{class:'small',style:'text-align:center'},'Cadastre mais jogadores (irmãos, amigos, colegas) para disputar o pódio!'):null),
+    h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'Classificação'),L.map((p,i)=>h('div',{class:'rv '+(p.id===IX.active?'ok':''),style:'align-items:center'},h('div',{style:'font-size:28px;width:44px'},MED[i]||(i+1)+'º'),h('div',{style:'flex:1'},h('b',{},p.name),h('div',{class:'small'},`Nível ${p.lvl} · ⭐ ${p.stars} · 🪙 ${p.earned} ganhas`)),p.id===IX.active?h('span',{class:'chip'},'Jogando agora'):h('button',{class:'g',style:'min-height:40px',onclick:()=>switchPlayer(p.id)},'Jogar como')))),
+    h('div',{class:'card',style:'margin-top:14px'},h('h3',{},'➕ Novo jogador'),(()=>{const i=h('input',{type:'text',maxlength:'14',placeholder:'Apelido',style:'font-size:22px;padding:10px;border-radius:14px;border:3px solid #cfe0f3;width:220px;font-family:inherit'});return h('div',{},i,h('button',{class:'g',style:'margin-left:10px',onclick:()=>newPlayer(i.value)},'Criar'));})(),
+      h('p',{class:'small'},'Como o pódio funciona: a pontuação é o total de ⭐ e de 🪙 ganhos (gastar moedas na loja não tira você do ranking). Hoje ele compara os jogadores deste aparelho. Para comparar com outras crianças pela internet será preciso um servidor e a autorização dos pais (LGPD/COPPA), com apelidos apenas; os dados de cada jogador já têm essa estrutura (identificador, apelido, estrelas e moedas).')));}
+
+/* ============ início ============ */
+function screenHome(){running=false;updHeader();
+  const hero=h('div',{class:'hero'},mascot(),h('div',{},h('h1',{},S.name?`Oi, ${S.name}!`:'Oi! Eu sou o Zeca!'),h('p',{},S.name?'Pronto para a aventura dos números? 🚀':'Vamos treinar matemática e juntar prêmios!')));
+  if(!S.name){const inp=h('input',{type:'text',maxlength:'14',placeholder:'Seu apelido',style:'font-size:24px;padding:10px 14px;border-radius:16px;border:3px solid #cfe0f3;width:240px;font-family:inherit'});
+    stage.replaceChildren(hero,h('div',{class:'card'},h('p',{},'Como posso te chamar? (pode ser um apelido — fica só neste aparelho)'),inp,h('button',{class:'g',style:'margin-left:10px',onclick:()=>{S.name=(inp.value||'Explorador(a)').trim().slice(0,14);save();screenHome();}},'Começar')));return;}
+  stage.replaceChildren(hero,
+    h('div',{class:'mission',style:'background:linear-gradient(135deg,#ff9f1c,#e5484d);margin-bottom:14px'},h('div',{style:'font-size:56px'},'🌱'),h('div',{style:'flex:1;min-width:220px'},h('h2',{},'Missão Mais e Menos'),h('p',{},'Para quem está começando: somas, subtrações com "vai-um" e "empréstimo", balões, relâmpago e mini-prova — em blocos curtos, com pausa.')),h('button',{class:'y',style:'font-size:22px',onclick:()=>startMission('as')},'Começar!')),
+    h('div',{class:'mission'},h('div',{style:'font-size:56px'},'🚀'),h('div',{style:'flex:1;min-width:220px'},h('h2',{},'Missão de 1 hora'),h('p',{},'Para multiplicação e divisão: aquecimento, cadernos, balões, tabuada oral, mini-prova e baú do tesouro — tudo em blocos curtos, com pausa.')),h('button',{class:'y',style:'font-size:22px',onclick:()=>startMission('md')},'Começar!')),
+    h('div',{class:'grid'},
+      h('button',{class:'tile',onclick:()=>screenLevels('add')},h('span',{class:'e'},'➕'),'Adição',h('small',{},'4 níveis · "vai-um"')),
+      h('button',{class:'tile',onclick:()=>screenLevels('sub')},h('span',{class:'e'},'➖'),'Subtração',h('small',{},'4 níveis · "empréstimo"')),
+      h('button',{class:'tile',onclick:()=>screenLevels('mult')},h('span',{class:'e'},'✖️'),'Multiplicação',h('small',{},'4 níveis no caderno')),
+      h('button',{class:'tile',onclick:()=>screenLevels('div')},h('span',{class:'e'},'➗'),'Divisão',h('small',{},'exata e com resto · 4 níveis')),
+      h('button',{class:'tile',onclick:screenTabuada},h('span',{class:'e'},'🎤'),'Tabuada',h('small',{},'aprender, relâmpago e prova oral')),
+      h('button',{class:'tile',onclick:screenExams},h('span',{class:'e'},'📝'),'Simulados',h('small',{},'provas de treino')),
+      h('button',{class:'tile',onclick:screenPodium},h('span',{class:'e'},'🏅'),'Pódio',h('small',{},'ranking e jogadores')),
+      h('button',{class:'tile',onclick:screenRewards},h('span',{class:'e'},'🏆'),'Prêmios',h('small',{},'loja e troféus')),
+      h('button',{class:'tile',onclick:screenParents},h('span',{class:'e'},'👨‍👩‍👧'),'Pais e Professores',h('small',{},'progresso e privacidade'))));}
+
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
+try{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
+updHeader();screenHome();
+window.__t={buildMult,buildDiv,genMult,genDiv,buildAdd,buildSub,genAdd,genSub,genSum,makeExercise,ptNum,S:()=>S};
+</script>
+</body>
+</html>

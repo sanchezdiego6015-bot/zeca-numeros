@@ -1,0 +1,17 @@
+{
+  "name": "Zeca e a Aventura dos Números",
+  "short_name": "Zeca",
+  "description": "Jogo de matemática para crianças: adição, subtração, multiplicação, divisão e tabuada.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#43c97d",
+  "theme_color": "#26b562",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
