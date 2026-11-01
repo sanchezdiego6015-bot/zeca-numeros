@@ -120,18 +120,35 @@ canvas.scratch{width:100%;height:150px;background:#fffef7;border-radius:14px;box
 .igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:10px}.icard{background:#f6fbff;border-radius:18px;padding:8px;text-align:center;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 0 0 3px #e3eefb}.icard.on{box-shadow:inset 0 0 0 4px var(--purple)}.icard.try{box-shadow:inset 0 0 0 4px var(--yellow)}
 .icard button{min-height:42px;padding:2px 6px;font-size:14px}
 @keyframes ring{50%{box-shadow:0 0 0 12px rgba(229,72,77,.25)}}button.listening{animation:ring .9s infinite}.ithumb svg{width:100%;height:92px}.iname{font-weight:700;font-size:15px;min-height:38px;display:flex;align-items:center;justify-content:center}.itag{font-size:13px;color:#12864a;font-weight:700}
+#celebrate{position:fixed;right:10px;bottom:6px;z-index:60;pointer-events:none;text-align:center;animation:cin .3s ease-out}#celebrate.out{opacity:0;transition:opacity .3s}
+@keyframes cin{from{transform:translateY(40px);opacity:0}}
+.cbub{background:#fff;border-radius:18px;padding:8px 14px;font-weight:700;font-size:20px;box-shadow:0 4px 0 rgba(0,0,0,.12);margin-bottom:4px;max-width:260px;display:inline-block}
+.dance svg{animation:zdance .56s ease-in-out infinite;transform-origin:160px 500px}
+.dance .zhead{animation:zhead .56s ease-in-out infinite;transform-origin:160px 190px}
+.dance .ztail{animation:ztail .28s ease-in-out infinite alternate;transform-origin:212px 405px}
+@keyframes zdance{0%,100%{transform:translateY(0) rotate(-3deg)}25%{transform:translateY(-16px) rotate(0)}50%{transform:translateY(0) rotate(3deg)}75%{transform:translateY(-16px) rotate(0)}}
+@keyframes zhead{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes ztail{from{transform:rotate(-12deg)}to{transform:rotate(12deg)}}
+.note{position:absolute;font-size:30px;color:#7c5cff;animation:nup 1.2s ease-out infinite;opacity:0}.n1{right:8px;top:70px}.n2{left:6px;top:110px;animation-delay:.4s}.n3{right:40px;top:30px;animation-delay:.8s}
+@keyframes nup{0%{transform:translateY(20px) scale(.6);opacity:0}30%{opacity:1}100%{transform:translateY(-40px) scale(1.1);opacity:0}}
+.mascot.hop{animation:hop .6s ease-out 1}@keyframes hop{0%{transform:translateY(0)}35%{transform:translateY(-16px) rotate(-6deg)}70%{transform:translateY(0) rotate(5deg)}100%{transform:translateY(0)}}
+.mz{text-align:center;line-height:0;margin-bottom:6px}.mz svg{max-width:100%}
+#btnWho{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ptext{font-size:21px;line-height:1.35;margin:4px 0 8px;font-weight:700;color:#2a4a6b;max-width:640px}
 table.st{border-collapse:collapse;width:100%;font-size:16px}table.st td,table.st th{padding:6px 8px;border-bottom:1px solid #e3eefb;text-align:left}
 </style>
 </head>
 <body>
 <header id="top">
   <button class="w" id="btnHome" title="Início">🏠</button>
+  <button class="w" id="btnWho" title="Trocar de jogador">👤 <span id="hWho"></span></button>
   <div class="chip">⭐ <b id="hStars">0</b></div>
   <div class="chip">🪙 <b id="hCoins">0</b></div>
   <div class="chip">Nv <b id="hLvl">1</b><span class="xpbar"><i id="hXp"></i></span></div>
   <div class="chip" id="hCombo" style="display:none">🔥 ×<b>0</b></div>
   <div class="spacer"></div>
   <div class="chip" id="hTime">⏱ 00:00</div>
+  <button class="w" id="btnCheer" title="Zeca animado (dança e parabéns)">🎉</button>
   <button class="w" id="btnSound" title="Sons">🔊</button>
   <button class="w" id="btnVoice" title="Voz">🗣️</button>
 </header>
@@ -162,9 +179,10 @@ function wr(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 let IX=rd(IDX)||{active:'p1',ids:['p1']};
 const KEY=keyOf(IX.active);let NOSAVE=false;
 const mkLv=()=>range(0,3).map(()=>({done:false,best:0,tries:0}));
-function defaults(){return{id:IX.active,name:'',stars:0,coins:0,spent:0,xp:0,owned:[],outfit:[],equip:'',sound:true,voice:false,lvl:{mult:mkLv(),div:mkLv(),add:mkLv(),sub:mkLv()},facts:{},stats:{},errKinds:{},ms:0,t:{ex:0,combo:0,balloons:0,exams:0,bestExam:0,missions:0},trophies:[],exams:[],sessions:[]};}
+function defaults(){return{id:IX.active,name:'',stars:0,coins:0,spent:0,xp:0,owned:[],outfit:[],equip:'',cheer:true,sound:true,voice:false,lvl:{mult:mkLv(),div:mkLv(),add:mkLv(),sub:mkLv(),mfac:mkLv(),dfac:mkLv(),dq:mkLv(),pm1:mkLv(),pm2:mkLv()},facts:{},stats:{},errKinds:{},ms:0,t:{ex:0,combo:0,balloons:0,exams:0,bestExam:0,missions:0},trophies:[],exams:[],sessions:[]};}
 let S=Object.assign(defaults(),rd(KEY)||{});
 if(!Array.isArray(S.outfit))S.outfit=[];if(S.equip&&!S.outfit.length){S.outfit=[S.equip];S.equip='';}
+for(const k of['add','sub','mfac','dfac','dq','pm1','pm2'])S.lvl[k]=S.lvl[k]||mkLv();if(S.cheer===undefined)S.cheer=true;
 S.lvl.add=S.lvl.add||mkLv();S.lvl.sub=S.lvl.sub||mkLv();
 const SES={t:Date.now(),ok:0,err:0,c0:S.coins+S.spent,s0:S.stars};
 function save(){if(NOSAVE)return;try{if(sessionSec>=5||SES.ok+SES.err>0){const e={t:SES.t,sec:sessionSec,ok:SES.ok,err:SES.err,coins:S.coins+S.spent-SES.c0,stars:S.stars-SES.s0};const a=S.sessions;if(a.length&&a[a.length-1].t===SES.t)a[a.length-1]=e;else a.push(e);if(a.length>30)a.splice(0,a.length-30);}localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -190,12 +208,22 @@ function factSpeech(f,r){const op=f.op,p=valF(f),sp=op?`${f.a} ${op==='+'?'mais'
 function confetti(n=40){const box=h('div',{class:'confetti'});document.body.append(box);const em=['🎉','⭐','✨','🎊','💫','🌟'];for(let i=0;i<n;i++)box.append(h('span',{style:`left:${Math.random()*100}vw;animation-delay:${Math.random()*.7}s;font-size:${18+Math.random()*22}px`},em[i%em.length]));setTimeout(()=>box.remove(),3400);}
 function toast(t){const box=$('#toast');const d=h('div',{},t);box.append(d);setTimeout(()=>d.remove(),3000);}
 
+/* ============ Zeca comemora ============ */
+const PRAISE_V=['Muito bem!','Isso mesmo!','Parabéns!','Mandou bem!','Acertou!','Show de bola!'];
+function cheerHop(el){if(!S.cheer||!el)return;el.classList.remove('hop');void el.offsetWidth;el.classList.add('hop');}
+function celebrate(text,voice,ms=2800){return new Promise(res=>{if(!S.cheer){res();return;}
+  const box=h('div',{id:'celebrate',class:'dance'}),z=h('div',{class:'cz'});z.innerHTML=zecaSVG(S.outfit,'full',250);
+  box.append(h('div',{class:'cbub'},text),z,h('span',{class:'note n1'},'♪'),h('span',{class:'note n2'},'♫'),h('span',{class:'note n3'},'♪'));document.body.append(box);
+  if(voice)sayKid(voice);confetti(22);setTimeout(()=>{box.classList.add('out');setTimeout(()=>{box.remove();res();},320);},ms);});}
+const danceZ=(ht=150)=>{const d=h('div',{class:'dance mz'});d.innerHTML=zecaSVG(S.outfit,'full',ht);return d;};
 /* ============ cabeçalho ============ */
 const lvlOf=xp=>1+Math.floor(xp/100);
-function updHeader(){$('#hStars').textContent=S.stars;$('#hCoins').textContent=S.coins;$('#hLvl').textContent=lvlOf(S.xp);$('#hXp').style.width=(S.xp%100)+'%';const c=$('#hCombo');c.style.display=combo>=2?'':'none';c.querySelector('b').textContent=combo;$('#btnSound').textContent=S.sound?'🔊':'🔇';$('#btnVoice').style.opacity=S.voice?1:.45;}
+function updHeader(){$('#hStars').textContent=S.stars;$('#hCoins').textContent=S.coins;$('#hLvl').textContent=lvlOf(S.xp);$('#hXp').style.width=(S.xp%100)+'%';const c=$('#hCombo');c.style.display=combo>=2?'':'none';c.querySelector('b').textContent=combo;$('#btnSound').textContent=S.sound?'🔊':'🔇';$('#btnVoice').style.opacity=S.voice?1:.45;$('#btnCheer').style.opacity=S.cheer?1:.45;$('#hWho').textContent=S.name||'Jogador';}
 function addXp(n){const before=lvlOf(S.xp);S.xp+=n;if(lvlOf(S.xp)>before){confetti(30);SFX.win();toast(`🎉 O Zeca subiu para o nível ${lvlOf(S.xp)}!`);}updHeader();}
 setInterval(()=>{if(document.hidden)return;sessionSec++;S.ms+=1000;$('#hTime').textContent='⏱ '+fmtT(sessionSec);if(sessionSec%10===0)save();},1000);
 $('#btnSound').onclick=()=>{S.sound=!S.sound;save();updHeader();};
+$('#btnCheer').onclick=()=>{S.cheer=!S.cheer;save();updHeader();toast(S.cheer?'🎉 Zeca animado: ele dança e dá parabéns!':'Zeca calmo: sem dança e sem parabéns falados.');};
+$('#btnWho').onclick=async()=>{if(running&&!(await confirmModal('Trocar de jogador? O exercício atual será encerrado (o progresso já ganho fica guardado).','Trocar','Continuar jogando')))return;playerPicker();};
 $('#btnVoice').onclick=()=>{S.voice=!S.voice;save();updHeader();if(S.voice)say('Olá! Eu vou ler as perguntas para você.');};
 $('#btnHome').onclick=async()=>{if(!running){screenHome();return;}const ok=await confirmModal('Voltar ao início? O progresso já ganho fica guardado. ');if(ok){save();location.reload();}};
 
@@ -219,7 +247,7 @@ const ZB_HEAD=`<path d="M104 94 L96 36 L142 68Z" fill="#f08a24"/><path d="M216 9
 <circle cx="112" cy="152" r="9" fill="#ff9aa8" opacity=".45"/><circle cx="208" cy="152" r="9" fill="#ff9aa8" opacity=".45"/>
 <ellipse cx="130" cy="122" rx="9" ry="12" fill="#2b1d16"/><ellipse cx="190" cy="122" rx="9" ry="12" fill="#2b1d16"/><circle cx="127" cy="117" r="3.2" fill="#fff"/><circle cx="187" cy="117" r="3.2" fill="#fff"/>
 <ellipse cx="160" cy="158" rx="10" ry="7" fill="#2b1d16"/><path d="M147 170 Q160 183 173 170" stroke="#2b1d16" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
-const ZB=ZB_TAIL+ZB_BODY+ZB_HEAD;
+const ZB_TAILG=`<g class="ztail">${ZB_TAIL}</g>`;
 /* corte (viewBox) de cada região, usado nas miniaturas e no Zeca pequeno */
 const CROP={full:'0 -30 320 560',head:'70 -34 180 240',face:'90 90 140 90',neck:'100 170 120 120',torso:'60 190 200 180',legs:'90 320 140 190',feet:'90 430 140 90',back:'30 150 260 320',hand:'40 120 260 260'};
 /* ---- fábricas de peças ---- */
@@ -295,8 +323,8 @@ const SLOTS=[['head','🎩','Cabeça'],['face','🕶️','Rosto'],['neck','🧣'
 function zecaSVG(outfit,crop='full',ht=''){
   const its=(outfit||[]).map(id=>ITEM[id]).filter(Boolean),sl=s=>its.filter(i=>i.slot===s);
   const back=its.filter(i=>i.back).map(i=>i.back).join(''),front=its.filter(i=>i.front).map(i=>i.front).join('');
-  const body=sl('legs').map(i=>i.svg).join('')+sl('feet').map(i=>i.svg).join('')+sl('torso').map(i=>i.svg).join('')+front+sl('neck').map(i=>i.svg).join('')+sl('face').map(i=>i.svg).join('')+sl('head').map(i=>i.svg).join('')+sl('hand').map(i=>i.svg).join('');
-  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${CROP[crop]||crop}" ${ht?`height="${ht}"`:''} role="img" aria-label="Zeca">${back}${ZB}${body}</svg>`;}
+  const body=sl('legs').map(i=>i.svg).join('')+sl('feet').map(i=>i.svg).join('')+sl('torso').map(i=>i.svg).join('')+front+sl('neck').map(i=>i.svg).join('')+`<g class="zhead">${ZB_HEAD}${sl('face').map(i=>i.svg).join('')}${sl('head').map(i=>i.svg).join('')}</g>`+sl('hand').map(i=>i.svg).join('');
+  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${CROP[crop]||crop}" ${ht?`height="${ht}"`:''} role="img" aria-label="Zeca">${back}${ZB_TAILG}${ZB_BODY}${body}</svg>`;}
 function applyItem(list,id){const it=ITEM[id];if(!it)return list;const o=list.filter(x=>{const y=ITEM[x];if(!y)return false;if(y.slot===it.slot)return false;if((it.blocks||[]).includes(y.slot))return false;if((y.blocks||[]).includes(it.slot))return false;return true;});o.push(id);return o;}
 const mascot=(cls='')=>{const e=h('span',{class:'mascot '+cls});e.innerHTML=zecaSVG(S.outfit,cls.includes('sm')?'head':'full');return e;};
 let wTab='head',tryOn=[];
@@ -329,6 +357,8 @@ const TROPHIES=[
  {id:'a1',e:'➕',n:'Somador',d:'Conclua o nível 1 de adição',ok:()=>S.lvl.add[0].done},
  {id:'s1',e:'➖',n:'Subtrator',d:'Conclua o nível 1 de subtração',ok:()=>S.lvl.sub[0].done},
  {id:'as4',e:'🌟',n:'Mestre do mais e do menos',d:'Conclua o nível 4 de adição e de subtração',ok:()=>S.lvl.add[3].done&&S.lvl.sub[3].done},
+ {id:'pm',e:'🧩',n:'Resolvedor de problemas',d:'Conclua o nível 1 de um módulo de problemas',ok:()=>S.lvl.pm1[0].done||S.lvl.pm2[0].done},
+ {id:'fac',e:'✨',n:'Mestre dos fatores',d:'Conclua o nível 4 de dobro/triplo ou metade/terço',ok:()=>S.lvl.mfac[3].done||S.lvl.dfac[3].done},
  {id:'hour',e:'🚀',n:'Missão cumprida',d:'Complete a Missão de 1 hora',ok:()=>S.t.missions>=1}];
 function checkTrophies(){for(const t of TROPHIES){if(!S.trophies.includes(t.id)&&t.ok()){S.trophies.push(t.id);toast(`🏆 Novo troféu: ${t.n}!`);confetti(20);}}save();}
 
@@ -347,8 +377,8 @@ function genMult(L){
 function genDiv(L){let d,D;
   if(L===1){d=rnd(2,5);D=d*rnd(2,9);}
   else if(L===2){d=rnd(2,8);D=d*rnd(10,Math.floor(99/d));}
-  else if(L===3){d=rnd(3,9);if(Math.random()<.2)D=d*rnd(Math.ceil(20/d),Math.floor(99/d));else{do{D=rnd(20,99);}while(D%d===0);}}
-  else{d=rnd(3,9);if(Math.random()<.15)D=d*rnd(Math.ceil(100/d),Math.floor(999/d));else{do{D=rnd(100,999);}while(D%d===0);}}
+  else if(L===3){d=rnd(2,9);if(Math.random()<.2)D=d*rnd(Math.ceil(20/d),Math.floor(99/d));else{do{D=rnd(20,99);}while(D%d===0);}}
+  else{d=rnd(2,10);if(Math.random()<.15)D=d*rnd(Math.ceil(100/d),Math.floor(999/d));else{do{D=rnd(100,999);}while(D%d===0);}}
   return[D,d];}
 
 /* ---- adição e subtração armadas ---- */
@@ -477,8 +507,77 @@ function buildDiv(D,d){
   return{type:'d',rows,quot,steps,answer:Math.floor(D/d),rest:D%d};}
 
 const GEN={mult:genMult,div:genDiv,add:genAdd,sub:genSub},BLD={mult:buildMult,div:buildDiv,add:buildAdd,sub:buildSub};
-const OPS={mult:'×',div:'÷',add:'+',sub:'−'},KNAME={mult:'Multiplicação',div:'Divisão',add:'Adição',sub:'Subtração'};
-function makeExercise(kind,L){const[a,b]=GEN[kind](L);return Object.assign({kind,L,a,b,errTotal:0},BLD[kind](a,b));}
+const OPS={mult:'×',div:'÷',add:'+',sub:'−',mfac:'×',dfac:'÷',dq:'÷'},KNAME={mult:'Multiplicação',div:'Divisão',add:'Adição',sub:'Subtração',mfac:'Dobro, triplo…',dfac:'Metade, terço…',dq:'Quantas vezes cabe?',pm1:'Problemas 1',pm2:'Problemas 2'};
+function makeExercise(kind,L){
+  if(kind==='mfac'){const{a,f}=genMF(L),w=MFNAME[f],[A,B]=f===10?[10,a]:[a,f];
+    return Object.assign({kind,L,a:A,b:B,errTotal:0,label:`O ${w} de ${a}`,formula:f===10?`${a} × 10 (vamos armar como 10 × ${a})`:`${a} × ${f}`,
+      pre:{text:`O ${w} de ${a}`,q:`"${cap(w)}" quer dizer ${a} × quanto?`,correct:f,options:factorOptions(f),
+        h1:'Lembre: dobro = 2 vezes, triplo = 3 vezes, quádruplo = 4 vezes, quíntuplo = 5 vezes…',h2:`${cap(w)} quer dizer <b>${f} vezes</b>. Então o ${w} de ${a} é <b>${a} × ${f}</b>.`}},buildMult(A,B));}
+  if(kind==='dfac'){const{f,D}=genDF(L),lab=`${cap(dfName(f))} de ${D}`+(f>2?` (${DFALT[f]})`:'');
+    return Object.assign({kind,L,a:D,b:f,errTotal:0,label:lab,formula:`${D} ÷ ${f}`,
+      pre:{text:lab,q:`Para achar ${dfName(f)}, dividimos por quanto?`,correct:f,options:factorOptions(f).map(o=>({v:o.v,label:'÷ '+o.v})),
+        h1:'Lembre: metade = ÷ 2, terça parte (um terço) = ÷ 3, quarta parte (um quarto) = ÷ 4, quinta parte = ÷ 5…',h2:`${cap(dfName(f))} quer dizer <b>dividir por ${f}</b>. Então ${dfName(f)} de ${D} é <b>${D} ÷ ${f}</b>.`}},buildDiv(D,f));}
+  if(kind==='dq'){const[D,d]=genDQ(L);return Object.assign({kind,L,a:D,b:d,errTotal:0,label:`Quantas vezes o ${d} cabe em ${D}?`,formula:`${D} ÷ ${d}`},buildDiv(D,d));}
+  const[a,b]=GEN[kind](L);return Object.assign({kind,L,a,b,errTotal:0},BLD[kind](a,b));}
+/* ============ módulos novos: fatores, partes iguais, quantas vezes cabe e problemas ============ */
+const MFNAME={2:'dobro',3:'triplo',4:'quádruplo',5:'quíntuplo',6:'sêxtuplo',7:'sétuplo',8:'óctuplo',9:'nônuplo',10:'décuplo'};
+const DFPART={2:'metade',3:'terça parte',4:'quarta parte',5:'quinta parte',6:'sexta parte',7:'sétima parte',8:'oitava parte',9:'nona parte',10:'décima parte'};
+const DFALT={3:'um terço',4:'um quarto',5:'um quinto',6:'um sexto',7:'um sétimo',8:'um oitavo',9:'um nono',10:'um décimo'};
+const cap=t=>t[0].toUpperCase()+t.slice(1);
+function genMF(L){return{f:L===1?rnd(2,3):L===2?rnd(2,5):rnd(2,10),a:L===1?rnd(2,15):L<=3?rnd(11,99):rnd(101,499)};}
+function genDF(L){const f=L===1?rnd(2,4):L===4?rnd(5,10):rnd(2,10);const lo=L<=2?20:100,hi=L<=2?99:999;const D=f*(L===1?rnd(3,Math.floor(99/f)):rnd(Math.ceil(lo/f),Math.floor(hi/f)));return{f,D};}
+function genDQ(L){const d=L<=2?rnd(2,9):L===3?rnd(2,10):rnd(3,10);const D=L===1?rnd(10,50):L===2?rnd(30,99):L===3?rnd(100,500):rnd(500,999);return[D,d];}
+function factorOptions(f){const s=new Set([f]);for(const c of shuffle([f-1,f+1,f-2,f+2,f+3,f-3]))if(s.size<4&&c>=2&&c<=10)s.add(c);return shuffle([...s]).map(v=>({v,label:'× '+v}));}
+const dfName=f=>f===2?'a metade':'a '+DFPART[f];
+/* escolha entre opções, com dica e explicação (usada na tradução "triplo = ×3" e na escolha da operação) */
+function askChoice(cfg){return new Promise(res=>{
+  running=true;let wrong=0,busy=false;const ctx=cfg.ctx||{idx:0,count:1};
+  const fb=h('div',{class:'fb',style:'color:#243b53;min-height:56px;font-size:19px'}),box=h('div',{style:'display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:14px 0'});
+  const dots=h('div',{class:'dots',style:'justify-content:center'});for(let i=0;i<ctx.count;i++)dots.append(h('span',{class:'dot'+(i<ctx.idx?' d':i===ctx.idx?' c':'')}));
+  const zc=mascot('sm');let hi=null;const btns=[];
+  cfg.options.forEach(o=>{const b=h('button',{class:'w',style:'min-width:130px;font-size:24px;min-height:68px;border:3px solid #cfe0f3;background:#f4f9ff',onclick:async()=>{
+    if(busy)return;busy=true;
+    if(o.v===cfg.correct){b.classList.remove('w');b.classList.add('g');SFX.ok();SES.ok++;combo++;S.t.combo=Math.max(S.t.combo,combo);addXp(1);cheerHop(zc);if(S.cheer)sayKid(pick(PRAISE_V));fb.textContent='✔ Isso mesmo!';updHeader();await sleep(800);res(wrong);return;}
+    wrong++;SES.err++;combo=0;updHeader();SFX.oops();b.classList.add('shake');b.style.opacity='.45';await sleep(450);b.classList.remove('shake');
+    if(wrong===1){fb.innerHTML=pick(ENC)+'<br>💡 '+cfg.h1;}
+    else if(wrong===2){const sp='Vamos entender juntos. '+cfg.h2;sayKid(sp);await modal([h('h2',{},'Vamos entender juntos 🧠'),h('div',{class:'ex',html:cfg.h2}),replayBtn(sp)],'Entendi!');const rb=btns.find(x=>x.o.v===cfg.correct);if(rb){rb.b.style.boxShadow='0 0 0 5px #1fb866';rb.b.style.opacity='1';}fb.innerHTML='Agora toque na resposta certa 👆';}
+    else fb.innerHTML='Toque na resposta que está brilhando em verde 💚';
+    busy=false;}},o.label);btns.push({o,b});box.append(b);});
+  stage.replaceChildren(h('div',{class:'fcard'},h('div',{style:'display:flex;align-items:center;justify-content:center;gap:12px'},zc,h('h2',{style:'margin:0'},cfg.title||'Vamos pensar!')),dots,
+    cfg.text?h('div',{class:'ptext',style:'margin:12px auto'},cfg.text,h('button',{class:'w',style:'min-height:36px;padding:2px 10px;margin-left:8px',onclick:()=>sayKid(cfg.text)},'🔊')):null,
+    h('div',{style:'font-size:24px;font-weight:700;color:#7c5cff;margin-top:6px'},cfg.q),box,fb));
+  if(S.voice)say(cfg.text?cfg.text+' '+cfg.q:cfg.q);});}
+const CUE={mult:'Quando falamos de grupos iguais, de "cada", "vezes", "dobro" ou "triplo", usamos a <b>multiplicação</b>.',add:'Quando juntamos quantidades ("juntos", "no total", "ganhou"), usamos a <b>soma</b>.',sub:'Quando queremos saber quanto sobrou, quanto falta ou "quantos a mais", usamos a <b>subtração</b>.',div:'Quando repartimos igualmente ou perguntamos quantas vezes cabe, usamos a <b>divisão</b>.'};
+const OPNAME={add:'soma',sub:'subtração',mult:'multiplicação',div:'divisão'};
+const chooseOp=(pr,part,ctx)=>askChoice({title:'Problema',ctx,text:pr.text,q:part.q||'Que conta resolve o problema?',correct:part.op,
+  options:[{v:'add',label:'➕ Somar'},{v:'sub',label:'➖ Subtrair'},{v:'mult',label:'✖️ Multiplicar'},{v:'div',label:'➗ Dividir'}],
+  h1:CUE[part.op].replace(/<\/?b>/g,''),h2:`A conta certa aqui é a <b>${OPNAME[part.op]}</b>. ${CUE[part.op]}`});
+async function runProblem(pr,ctx){let errs=0,assists=0;
+  for(let i=0;i<pr.parts.length;i++){const part=pr.parts[i];
+    errs+=await chooseOp(pr,part,{idx:ctx.idx,count:ctx.count});
+    const last=i===pr.parts.length-1,ex=Object.assign({kind:part.op,L:ctx.L,a:part.a,b:part.b,errTotal:0,title:'Problema',text:(part.note?part.note+' ':'')+pr.text,unit:last?pr.unit:part.unit},BLD[part.op](part.a,part.b));
+    const r=await runExercise(ex,{idx:ctx.idx,count:ctx.count,L:ctx.L});errs+=r.errors;assists+=r.assists;}
+  return{stars:errs===0?3:errs<=2?2:1,errors:errs,assists,hints:0};}
+async function runItem(ex,ctx){
+  if(ex.parts)return runProblem(ex,ctx);
+  let pre=0;if(ex.pre)pre=await askChoice(Object.assign({title:KNAME[ex.kind],ctx},ex.pre));
+  const r=await runExercise(ex,ctx);if(!pre)return r;const errors=r.errors+pre;return{...r,errors,stars:errors===0?3:errors<=2?2:1};}
+const NM=['Teo','Lia','Caio','Bia','Davi','Maya','Léo','Ana'];
+function genPM1(L){let a,b;
+  if(L===1){a=rnd(2,5);b=rnd(2,9);}else if(L===2){a=rnd(3,9);b=rnd(11,49);}else if(L===3){a=rnd(2,9);b=rnd(101,399);}else{a=rnd(12,29);b=rnd(11,19);}
+  const n=pick(NM),T=[[`Uma padaria faz ${a} fornadas com ${b} pães em cada fornada. Quantos pães a padaria fez?`,'pães'],[`Em um auditório há ${a} fileiras e cada fileira tem ${b} cadeiras. Quantas cadeiras há no auditório?`,'cadeiras'],[`Cada caderno custa ${b} reais. Quanto custam ${a} cadernos?`,'reais'],[`${n} lê ${b} páginas por dia. Quantas páginas ${n} lê em ${a} dias?`,'páginas'],[`Uma caixa tem ${b} lápis de cor. Quantos lápis há em ${a} caixas?`,'lápis'],[`Um jardim tem ${a} canteiros e cada canteiro tem ${b} flores. Quantas flores há no jardim?`,'flores']];
+  const t=pick(T);return{kind:'pm1',L,text:t[0],unit:t[1],errTotal:0,parts:[{op:'mult',a:Math.max(a,b),b:Math.min(a,b)}]};}
+function genPM2(L){
+  const n1=pick(NM);let n2;do{n2=pick(NM);}while(n2===n1);
+  const f=L===1?rnd(2,3):L===2?rnd(2,5):L===3?rnd(2,6):rnd(2,9),item=pick(['figurinhas','bolinhas de gude','livros','adesivos']);
+  let a,prod,tries=0;do{a=L===1?rnd(5,20):L===2?rnd(11,60):L===3?rnd(12,50):rnd(25,99);prod=a*f;tries++;}while(L===4&&tries<300&&!(subSim(prod,a).ok&&String(prod-a).length===String(prod).length));
+  const w=MFNAME[f];let text,parts;
+  if(L<=2){text=`${n1} tem ${a} ${item}. ${n2} tem o ${w} da quantidade de ${n1}. Quantas ${item} ${n2} tem?`;parts=[{op:'mult',a,b:f,q:'Que conta resolve o problema?'}];}
+  else if(L===3){text=`${n1} tem ${a} ${item} e ${n2} tem o ${w} dessa quantidade. Quantas ${item} ${n2} tem? E quantas as duas crianças têm juntas?`;parts=[{op:'mult',a,b:f,q:`Primeiro: quantas ${item} ${n2} tem?`,unit:item},{op:'add',a:prod,b:a,q:'Agora: quantas as duas têm juntas?'}];}
+  else{text=`${n1} tem ${a} ${item} e ${n2} tem o ${w} dessa quantidade. Quantas ${item} ${n2} tem a mais que ${n1}?`;parts=[{op:'mult',a,b:f,q:`Primeiro: quantas ${item} ${n2} tem?`,unit:item},{op:'sub',a:prod,b:a,q:`Agora: quantas ${n2} tem a mais?`}];}
+  return{kind:'pm2',L,text,unit:item,errTotal:0,parts};}
+const makeProblem=(kind,L)=>kind==='pm1'?genPM1(L):genPM2(L);
+
 
 /* ============ renderização do caderno ============ */
 function mkCell(c,map){const e=h('div',{class:'cell '+c.k+' '+(c.cls||'')});if(c.k==='fixed'||c.k==='sign'||c.k==='ph')e.textContent=c.v;if(c.id)map[c.id]=e;return e;}
@@ -506,11 +605,11 @@ function runExercise(ex,ctx){
     const map={},st={i:0,buf:'',assists:0,hints:0,busy:false,over:false};
     const body=ex.type==='v'?renderV(ex,map):renderD(ex,map);
     const dots=h('div',{class:'dots'});for(let i=0;i<ctx.count;i++)dots.append(h('span',{class:'dot'+(i<ctx.idx?' d':i===ctx.idx?' c':'')}));
-    const paper=h('div',{class:'paper'},h('div',{class:'ptitle'},h('span',{},`${KNAME[ex.kind]} · Nível ${ex.L}`),dots),h('div',{class:'prob'},`${ex.a} ${OPS[ex.kind]} ${ex.b}`),body);
+    const paper=h('div',{class:'paper'},h('div',{class:'ptitle'},h('span',{},`${ex.title||KNAME[ex.kind]} · Nível ${ex.L}`),dots),ex.text?h('div',{class:'ptext'},ex.text,h('button',{class:'w',style:'min-height:36px;padding:2px 10px;margin-left:8px',onclick:()=>sayKid(ex.text)},'🔊')):null,h('div',{class:'prob'},ex.label?ex.label:`${ex.a} ${OPS[ex.kind]} ${ex.b}`),ex.label&&ex.formula?h('div',{class:'small'},'Fica assim: '+ex.formula):null,body);
     const bubble=h('div',{class:'bubble'}),fb=h('div',{class:'fb'});
     const down=h('button',{class:'o',style:'display:none;width:100%'},'⬇ Baixar o próximo número');
     const ctl={digit:d=>press(d),back:()=>back(),extra:()=>hint(),extraLabel:'💡'};
-    const side=h('div',{class:'side'},h('div',{class:'coach'},mascot('sm'),bubble),fb,down,makePad(ctl));
+    const coachM=mascot('sm');const side=h('div',{class:'side'},h('div',{class:'coach'},coachM,bubble),fb,down,makePad(ctl));
     stage.replaceChildren(h('div',{class:'nbgrid'},paper,side));
     const unbind=bindKeys(ctl);
     const step=()=>ex.steps[st.i];
@@ -522,7 +621,7 @@ function runExercise(ex,ctx){
     function hint(){if(st.busy||st.over)return;const s=step();if(!s||!s.help1)return;st.hints++;setB('💡 '+s.help1);}
     async function submit(){if(st.busy)return;const s=step();if(st.buf===s.exp)await good(s);else await bad(s);}
     async function good(s){st.busy=true;s.cells.forEach(id=>{map[id].classList.remove('act','cur');map[id].classList.add(s.assisted?'assist':'ok');});if(s.strike&&map[s.strike])map[s.strike].classList.add('strike');SFX.ok();
-      SES.ok++;combo++;S.t.combo=Math.max(S.t.combo,combo);addXp(1);if(combo%5===0){S.coins+=3;toast(`🔥 Combo ×${combo}! +3 🪙`);}updHeader();
+      SES.ok++;combo++;S.t.combo=Math.max(S.t.combo,combo);cheerHop(coachM);if(S.cheer)sayKid(pick(PRAISE_V));addXp(1);if(combo%5===0){S.coins+=3;toast(`🔥 Combo ×${combo}! +3 🪙`);}updHeader();
       fb.textContent='✔ '+s.ok;st.i++;st.buf='';await sleep(430);st.busy=false;next();}
     async function bad(s){st.busy=true;s.errs=(s.errs||0)+1;ex.errTotal++;SES.err++;S.errKinds[s.kind]=(S.errKinds[s.kind]||0)+1;combo=0;updHeader();SFX.oops();
       s.cells.forEach(id=>map[id].classList.add('shake','bad'));await sleep(450);s.cells.forEach(id=>{map[id].classList.remove('shake','bad');map[id].textContent='';});st.buf='';
@@ -534,9 +633,17 @@ function runExercise(ex,ctx){
     function next(){if(st.i>=ex.steps.length)return finish();const s=step();st.buf='';down.style.display=s.kind==='down'?'':'none';setB(ctx.L>=3&&s.kind!=='down'?`<b>${s.short}</b>`:s.prompt);paintActive();}
     async function finish(){st.over=true;unbind();document.querySelectorAll('.cell.cur,.cell.act').forEach(e=>e.classList.remove('cur','act'));down.style.display='none';
       const stars=ex.errTotal===0?3:ex.errTotal<=2?2:1;
-      if(ex.kind!=='div')setB(`Resposta: <b>${ex.answer}</b>! ${pick(PRAISE)} 🎉`);
-      else setB(`Quociente <b>${ex.answer}</b>${ex.rest?`, resto <b>${ex.rest}</b>`:' (divisão exata)'}.<br>Prova real: ${ex.answer} × ${ex.b}${ex.rest?` + ${ex.rest}`:''} = ${ex.a} ✓`);
-      fb.textContent='';await sleep(1700);running=false;resolve({stars,errors:ex.errTotal,assists:st.assists,hints:st.hints});}
+      const divStyle=ex.kind==='div'||ex.kind==='dfac'||ex.kind==='dq';
+      if(ex.kind==='dq')setB(`O ${ex.b} cabe <b>${ex.answer}</b> ${ex.answer===1?'vez':'vezes'} no ${ex.a}${ex.rest?` e sobram <b>${ex.rest}</b>`:' (sem sobrar nada)'}.<br>Prova real: ${ex.answer} × ${ex.b}${ex.rest?` + ${ex.rest}`:''} = ${ex.a} ✓`);
+      else if(ex.kind==='dfac')setB(`${ex.label} é <b>${ex.answer}</b>.<br>Prova real: ${ex.answer} × ${ex.b} = ${ex.a} ✓`);
+      else if(ex.kind==='mfac')setB(`${ex.label} é <b>${ex.answer}</b>! ${pick(PRAISE)} 🎉`);
+      else if(divStyle)setB(`Quociente <b>${ex.answer}</b>${ex.rest?`, resto <b>${ex.rest}</b>`:' (divisão exata)'}.<br>Prova real: ${ex.answer} × ${ex.b}${ex.rest?` + ${ex.rest}`:''} = ${ex.a} ✓`);
+      else setB(`Resposta: <b>${ex.answer}</b>${ex.unit?' '+ex.unit:''}! ${pick(PRAISE)} 🎉`);
+      fb.textContent='';
+      const nm=S.name||'';
+      if(S.cheer)await celebrate(stars===3?`Parabéns, ${nm}! 🎉`:stars===2?`Muito bem, ${nm}! 👏`:`Parabéns por terminar, ${nm}! 💪`,stars===3?`Parabéns, ${nm}! Você acertou tudo!`:stars===2?`Muito bem, ${nm}! Você terminou!`:`Parabéns por terminar, ${nm}!`,2800);
+      else await sleep(1700);
+      running=false;resolve({stars,errors:ex.errTotal,assists:st.assists,hints:st.hints});}
     next();
   });}
 
@@ -545,18 +652,18 @@ async function rewardModal(r){
   const coins=r.stars*3+(r.errors===0?2:0);S.coins+=coins;S.stars+=r.stars;addXp(5);S.t.ex++;save();updHeader();
   confetti(r.stars*10+8);SFX.win();
   const msg=r.stars===3?'Sem erros! Você é craque!':r.stars===2?'Mandou bem! Errar faz parte de aprender.':'Você terminou — e isso é o que importa! Cada tentativa deixa seu cérebro mais forte 💪';
-  await modal([h('h2',{},pick(PRAISE)),h('div',{class:'big'},'⭐'.repeat(r.stars)+'☆'.repeat(3-r.stars)),h('p',{},msg),h('p',{},h('b',{},`+${coins} 🪙`),'  ·  +5 XP')],'Próximo ➜');checkTrophies();}
+  await modal([S.cheer?danceZ(150):null,h('h2',{},pick(PRAISE)),h('div',{class:'big'},'⭐'.repeat(r.stars)+'☆'.repeat(3-r.stars)),h('p',{},msg),h('p',{},h('b',{},`+${coins} 🪙`),'  ·  +5 XP')],'Próximo ➜');checkTrophies();}
 function bumpStats(ex,r){const k=ex.kind+ex.L;const s=S.stats[k]||(S.stats[k]={ex:0,clean:0,err:0,assist:0});s.ex++;if(r.errors===0)s.clean++;s.err+=r.errors;s.assist+=r.assists;}
 async function actNotebook(kind,L,count,opts={}){
   let stars=0,low=0;const seen=new Set();
   for(let i=0;i<count;i++){
     let useL=L;if(low>=2&&L>1){useL=L-1;toast('Vamos aquecer com um mais fácil 😉');low=0;}
-    let ex,tries=0;do{ex=makeExercise(kind,useL);tries++;}while(seen.has(ex.a+'_'+ex.b)&&tries<20);seen.add(ex.a+'_'+ex.b);
-    const r=await runExercise(ex,{idx:i,count,L:useL});bumpStats(ex,r);stars+=r.stars;low=r.stars===1?low+1:0;
+    let ex,tries=0;const key=e=>e.text||(e.a+'_'+e.b);do{ex=kind.startsWith('pm')?makeProblem(kind,useL):makeExercise(kind,useL);tries++;}while(seen.has(key(ex))&&tries<20);seen.add(key(ex));
+    const r=await runItem(ex,{idx:i,count,L:useL});bumpStats(ex,r);stars+=r.stars;low=r.stars===1?low+1:0;
     await rewardModal(r);
-    if(opts.breakAfter===i+1&&i<count-1)await actBalloons(4,{mult:['x','x','x','/'],div:['/','/','x'],add:['+','+','-'],sub:['-','-','+']}[kind]);}
+    if(opts.breakAfter===i+1&&i<count-1)await actBalloons(4,({mult:['x','x','x','/'],div:['/','/','x'],add:['+','+','-'],sub:['-','-','+'],mfac:['x'],dfac:['/','/','x'],dq:['/'],pm1:['x','x','+'],pm2:['x','x','+','-']})[kind]);}
   return{stars,max:count*3};}
-const LVL_TXT={add:['Somas até 20 (um algarismo + um algarismo)','2 algarismos, sem "vai-um"','2 algarismos, com "vai-um"','3 algarismos, com "vai-um"'],sub:['Subtrações até 20, sem emprestar','2 algarismos, sem emprestar','2 algarismos, emprestando','3 algarismos, emprestando'],mult:['2 algarismos × 1 (sem "vai-um")','2 algarismos × 1 (com "vai-um")','3 algarismos × 1','2 algarismos × 2 (desafio!)'],div:['Divisão exata (tabuada ao contrário)','Exata, quociente com 2 algarismos','Com resto: 2 algarismos ÷ 1','Com resto: 3 algarismos ÷ 1']};
+const LVL_TXT={mfac:['Dobro e triplo (números até 15)','Dobro até quíntuplo (2 algarismos)','Até o décuplo (2 algarismos)','Até o décuplo (3 algarismos)'],dfac:['Metade, terça e quarta parte (até 99)','Metade até décima parte (2 algarismos)','Até a décima parte (até 999)','Partes maiores: quinta a décima (até 999)'],dq:['Quantas vezes cabe? (até 50)','Quantas vezes cabe? (até 99)','Dividendo até 500','Dividendo até 999'],pm1:['Grupos iguais (tabuada)','2 algarismos × 1','3 algarismos × 1','2 algarismos × 2'],pm2:['O dobro e o triplo','Dobro até quíntuplo (2 algarismos)','Dois passos: multiplicar e somar','Dois passos: multiplicar e subtrair'],add:['Somas até 20 (um algarismo + um algarismo)','2 algarismos, sem "vai-um"','2 algarismos, com "vai-um"','3 algarismos, com "vai-um"'],sub:['Subtrações até 20, sem emprestar','2 algarismos, sem emprestar','2 algarismos, emprestando','3 algarismos, emprestando'],mult:['2 algarismos × 1 (sem "vai-um")','2 algarismos × 1 (com "vai-um")','3 algarismos × 1','2 algarismos × 2 (desafio!)'],div:['Divisão exata (tabuada ao contrário)','Exata, quociente com 2 algarismos','Com resto: 2 algarismos ÷ 1','Com resto: até 999 ÷ 2 a 10']};
 const firstOpen=kind=>{const i=S.lvl[kind].findIndex(l=>!l.done);return i<0?4:i+1;};
 async function playLevel(kind,L){
   S.lvl[kind][L-1].tries++;save();
@@ -564,14 +671,21 @@ async function playLevel(kind,L){
   const lv=S.lvl[kind][L-1];lv.best=Math.max(lv.best,res.stars);const was=lv.done;if(res.stars>=9||lv.tries>=2)lv.done=true;save();
   const med=res.stars>=13?'🥇 Ouro':res.stars>=9?'🥈 Prata':'🥉 Bronze';
   confetti(50);SFX.win();
-  await modal([h('h2',{},`Nível ${L} concluído!`),h('div',{class:'big'},med.split(' ')[0]),h('p',{},`Medalha de ${med.split(' ')[1]} — ${res.stars} de ${res.max} estrelas.`),
+  await modal([S.cheer?danceZ(170):null,h('h2',{},`Nível ${L} concluído! Parabéns, ${S.name}!`),h('div',{class:'big'},med.split(' ')[0]),h('p',{},`Medalha de ${med.split(' ')[1]} — ${res.stars} de ${res.max} estrelas.`),
     h('p',{},res.stars>=13?'Perfeito! Você domina este nível.':res.stars>=9?'Muito bem! Quer tentar de novo para ganhar ouro?':'Ótimo trabalho! Com mais uma rodada você sobe de medalha. Treino é o que faz a gente ficar bom!'),
     (lv.done&&!was&&L<4)?h('p',{},`🔓 Nível ${L+1} desbloqueado!`):null],'Continuar');
   checkTrophies();screenLevels(kind);}
+const HUBS={mult:{title:'✖️ Multiplicação',cards:[['mult','✏️','Contas no caderno','Multiplicar passo a passo, com "vai-um"'],['mfac','✨','Dobro, triplo, quádruplo…','Fatores de multiplicação, até o décuplo'],['pm1','🧩','Problemas do dia a dia','Grupos iguais, filas e colunas, preços'],['pm2','🧠','Problemas com dobro e triplo','Comparações e problemas de 2 passos']]},
+ div:{title:'➗ Divisão',cards:[['div','✏️','Contas no caderno','Divisão exata e com resto, até 999'],['dfac','✂️','Metade, terço, quarto…','Partes iguais, até a décima parte'],['dq','🧮','Quantas vezes cabe?','Dividendos até 999, com sobra']]}};
+const hubOf=kind=>Object.keys(HUBS).find(g=>HUBS[g].cards.some(c=>c[0]===kind));
+function screenHub(g){running=false;const H=HUBS[g];
+  stage.replaceChildren(h('button',{class:'w',onclick:screenHome},'⬅ Início'),h('h1',{},H.title),h('p',{},'Escolha um módulo. Cada um tem 4 níveis, com estrelas, medalhas e moedas.'),
+    h('div',{class:'levels'},H.cards.map(([k,e,t,d])=>{const L=S.lvl[k],done=L.filter(x=>x.done).length,stars=L.reduce((a,x)=>a+x.best,0);
+      return h('div',{class:'lv'},h('div',{style:'font-size:46px'},e),h('b',{style:'font-size:21px'},t),h('div',{class:'small'},d),h('div',{class:'med',style:'font-size:20px'},done?`${done}/4 níveis · ⭐ ${stars}`:'Novo!'),h('button',{class:'g',onclick:()=>screenLevels(k)},'Abrir'));})));}
 function screenLevels(kind){
-  running=false;const nm={mult:'Multiplicação ✖️',div:'Divisão ➗',add:'Adição ➕',sub:'Subtração ➖'}[kind];
+  running=false;const nm={mult:'Multiplicação: contas no caderno ✖️',div:'Divisão: contas no caderno ➗',add:'Adição ➕',sub:'Subtração ➖',mfac:'Dobro, triplo, quádruplo… ✨',dfac:'Metade, terço, quarto… ✂️',dq:'Quantas vezes cabe? 🧮',pm1:'Problemas do dia a dia 🧩',pm2:'Problemas com dobro, triplo e comparações 🧠'}[kind];
   const list=S.lvl[kind];
-  stage.replaceChildren(h('h1',{},nm),h('p',{},'Cada nível tem 5 exercícios no caderno, com estrelas, moedas e um intervalo divertido no meio.'),
+  const hub=hubOf(kind);stage.replaceChildren(h('button',{class:'w',onclick:()=>hub?screenHub(hub):screenHome()},'⬅ Voltar'),h('h1',{},nm),h('p',{},kind.startsWith('pm')?'Cada nível tem 5 problemas: primeiro você escolhe a conta certa e depois resolve no caderno. Há estrelas, moedas e um intervalo divertido no meio.':'Cada nível tem 5 exercícios no caderno, com estrelas, moedas e um intervalo divertido no meio.'),
     h('div',{class:'levels'},list.map((l,i)=>{const open=i===0||list[i-1].done;const med=l.best>=13?'🥇':l.best>=9?'🥈':l.best>0?'🥉':'';
       return h('div',{class:'lv'+(open?'':' locked')},h('div',{class:'n'},`Nível ${i+1}`),h('div',{class:'small'},LVL_TXT[kind][i]),h('div',{class:'med'},open?med:'🔒'),h('button',{class:open?'g':'w',onclick:()=>open&&playLevel(kind,i+1)},open?(l.tries?'Jogar de novo':'Jogar'):'Bloqueado'));})),
     (kind==='add'||kind==='sub')?h('div',{class:'card',style:'margin-top:14px;text-align:center'},h('h3',{},'⚡ Relâmpago de '+(kind==='add'?'somas':'subtrações')),h('p',{class:'small'},'10 contas de cabeça, contra o relógio. As que você erra voltam logo.'),h('div',{class:'chips'},h('button',{class:'o',onclick:async()=>{await actFacts({mode:'timed',tables:[10],count:10,op:kind==='add'?'+':'-'});screenLevels(kind);}},'Até 10'),h('button',{class:'r',onclick:async()=>{await actFacts({mode:'timed',tables:[20],count:10,op:kind==='add'?'+':'-'});screenLevels(kind);}},'Até 20'))):null,
@@ -647,12 +761,12 @@ function listenOnce(){return new Promise(res=>{const SR=window.SpeechRecognition
 async function actOral({tables,count=10}){
   running=true;
   const queue=pickFacts(tables,count).map(f=>({...f,rq:0}));const sum={ok:0,total:0,first:0};
-  let expCur=0,kbuf='',kpResolve=null,micOff=!(window.SpeechRecognition||window.webkitSpeechRecognition);
+  const zMsc=mascot('sm');let expCur=0,kbuf='',kpResolve=null,micOff=!(window.SpeechRecognition||window.webkitSpeechRecognition);
   const q=h('div',{class:'fq'}),ans=h('div',{class:'fa'}),tries=h('div',{style:'font-size:30px;letter-spacing:6px;margin:6px 0'}),status=h('div',{style:'min-height:30px;font-size:21px;font-weight:700;color:#12864a'}),said=h('div',{class:'small',style:'min-height:22px'}),dots=h('div',{class:'dots',style:'justify-content:center;margin-bottom:8px'});
   const ctl={digit:d=>{if(!kpResolve||kbuf.length>=String(expCur).length)return;kbuf+=d;ans.textContent=kbuf;SFX.tap();if(kbuf.length===String(expCur).length){const v=+kbuf;kbuf='';deliver({kind:'answer',value:v,said:String(v)});}},back:()=>{kbuf=kbuf.slice(0,-1);ans.textContent=kbuf;}};
   const micBtn=h('button',{class:'r',style:'margin:6px'},'🎤 Falar a resposta'),repBtn=h('button',{class:'w',style:'margin:6px'},'🔁 Ouvir a pergunta de novo');
   const setTries=n=>{tries.textContent='Tentativas: '+'🟢'.repeat(n)+'⚪'.repeat(3-n);};
-  stage.replaceChildren(h('div',{class:'fcard'},h('div',{style:'display:flex;align-items:center;justify-content:center;gap:12px'},mascot('sm'),h('h2',{style:'margin:0'},'🎤 Prova oral')),dots,q,ans,tries,status,said,micBtn,repBtn,h('div',{style:'max-width:360px;margin:12px auto 0'},makePad(ctl))));
+  stage.replaceChildren(h('div',{class:'fcard'},h('div',{style:'display:flex;align-items:center;justify-content:center;gap:12px'},zMsc,h('h2',{style:'margin:0'},'🎤 Prova oral')),dots,q,ans,tries,status,said,micBtn,repBtn,h('div',{style:'max-width:360px;margin:12px auto 0'},makePad(ctl))));
   const unbind=bindKeys(ctl);
   function deliver(o){const r=kpResolve;if(!r)return;kpResolve=null;kbuf='';stopListening();micBtn.classList.remove('listening');r(o);}
   const ask=(f,short)=>speakAsync(short?`${f.a} vezes ${f.b}?`:`Quanto é ${f.a} vezes ${f.b}?`);
@@ -677,7 +791,7 @@ async function actOral({tables,count=10}){
       if(attempts===1){status.textContent='Quase! Tente de novo.';await speakAsync('Quase! Tente de novo.');await ask(f,true);}
       else if(attempts===2){const hint=factHelp(f.a,f.b);status.textContent='Dica: '+hint;await speakAsync('Vamos pensar juntos. '+hint+' Qual é o resultado?');await ask(f,true);}
     }
-    if(ok){SES.ok++;S.coins+=1;addXp(1);SFX.ok();status.textContent=`✔ Isso mesmo! ${f.a} × ${f.b} = ${exp}`;ans.textContent=exp;await speakAsync(pick(['Muito bem!','Isso mesmo!','Acertou!','Perfeito!']));return{ok:true,attempts};}
+    if(ok){SES.ok++;S.coins+=1;addXp(1);SFX.ok();cheerHop(zMsc);status.textContent=`✔ Isso mesmo! ${f.a} × ${f.b} = ${exp}`;ans.textContent=exp;await speakAsync(pick(['Muito bem!','Isso mesmo!','Acertou!','Perfeito!']));return{ok:true,attempts};}
     /* 3 erros: o Zeca ensina e a criança precisa repetir a resposta certa para continuar */
     const sp=`Não foi dessa vez, mas tudo bem. ${f.a} vezes ${f.b} é ${exp}. ${factHelp(f.a,f.b)} Agora repita comigo: ${exp}.`;
     status.textContent='Vamos aprender juntos 💛';speakAsync(sp);
@@ -885,7 +999,7 @@ function voiceCard(){const L=ptVoices();const sel=h('select',{style:'font-size:1
     L.length?h('div',{},sel,h('div',{style:'margin-top:8px'},h('button',{class:'g',onclick:()=>speak('Oi! Eu sou o Zeca. Vamos aprender juntos?',true)},'🔊 Testar a voz'))):h('p',{},'Este aparelho não tem voz em português do Brasil instalada, então as explicações aparecem só escritas.'),
     h('p',{class:'small'},'A qualidade da voz depende do aparelho. Prefira vozes em português do Brasil marcadas como "Natural", "Online" ou "Aprimorada". Se não houver, instale uma nas configurações de voz/acessibilidade do tablet e abra o jogo de novo.'));}
 function panelParents(){
-  const rows=['add','sub','mult','div'].flatMap(k=>range(1,4).map(L=>{const s=S.stats[k+L];return h('tr',{},h('td',{},KNAME[k]+' · N'+L),h('td',{},s?s.ex:0),h('td',{},s?Math.round(s.clean/s.ex*100)+'%':'—'),h('td',{},s?(s.err/s.ex).toFixed(1):'—'),h('td',{},s?s.assist:'—'));}));
+  const rows=['add','sub','mult','mfac','pm1','pm2','div','dfac','dq'].flatMap(k=>range(1,4).map(L=>{const s=S.stats[k+L];return h('tr',{},h('td',{},KNAME[k]+' · N'+L),h('td',{},s?s.ex:0),h('td',{},s?Math.round(s.clean/s.ex*100)+'%':'—'),h('td',{},s?(s.err/s.ex).toFixed(1):'—'),h('td',{},s?s.assist:'—'));}));
   const KN={adig:'somar a coluna',sdig:'subtrair a coluna',borrow:'emprestar da casa vizinha',mdig:'multiplicar um dígito',carry:'"vai-um"',lead:'escrever a dezena final',sum:'somar as colunas',q:'achar o quociente',p:'multiplicar o quociente pelo divisor',r:'subtrair (resto)'};
   const ek=Object.entries(S.errKinds).sort((x,y)=>y[1]-x[1]).slice(0,3).map(([k,v])=>`${KN[k]||k} (${v})`);
   const weak=Object.entries(S.facts).filter(([k,v])=>v.seen>0&&v.box<=1).sort((x,y)=>(y[1].seen-y[1].ok)-(x[1].seen-x[1].ok)).slice(0,6).map(([k])=>k.replace('x',' × '));
@@ -909,8 +1023,19 @@ function screenSessions(){running=false;const ss=S.sessions.slice(-10).reverse()
 /* ============ pódio e jogadores ============ */
 let rankBy='stars';
 const allPlayers=()=>IX.ids.map(id=>{const d=id===IX.active?S:(rd(keyOf(id))||{});return{id,name:d.name||'Jogador',stars:d.stars||0,earned:(d.coins||0)+(d.spent||0),lvl:lvlOf(d.xp||0)};});
-function switchPlayer(id){save();IX.active=id;wr(IDX,IX);location.reload();}
-function newPlayer(name){name=(name||'').trim().slice(0,14);if(!name){toast('Digite um apelido');return;}if(IX.ids.length>=8){toast('Máximo de 8 jogadores');return;}save();const id='p'+Date.now().toString(36);IX.ids.push(id);IX.active=id;wr(IDX,IX);wr(keyOf(id),Object.assign(defaults(),{id,name}));location.reload();}
+const SSN={get:k=>{try{return sessionStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{sessionStorage.setItem(k,v);}catch(e){}}};
+function switchPlayer(id){SSN.set('zeca-chosen','1');save();IX.active=id;wr(IDX,IX);location.reload();}
+const playersInfo=()=>IX.ids.map(id=>{const d=id===IX.active?S:(rd(keyOf(id))||{});return{id,name:d.name||'Jogador',stars:d.stars||0,earned:(d.coins||0)+(d.spent||0),outfit:d.outfit||[],lvl:lvlOf(d.xp||0)};});
+function playerPicker(){const inp=h('input',{type:'text',maxlength:'14',placeholder:'Apelido do novo jogador',style:'font-size:20px;padding:10px;border-radius:14px;border:3px solid #cfe0f3;width:100%;max-width:300px;font-family:inherit'});
+  const rows=playersInfo().map(p=>{const th=h('div',{style:'width:60px;height:60px;flex:none;line-height:0'});th.innerHTML=zecaSVG(p.outfit,'head',60);
+    return h('div',{class:'rv '+(p.id===IX.active?'ok':''),style:'align-items:center'},th,h('div',{style:'flex:1'},h('b',{style:'font-size:20px'},p.name),h('div',{class:'small'},`Nível ${p.lvl} · ⭐ ${p.stars} · 🪙 ${p.earned}`)),p.id===IX.active?h('span',{class:'chip'},'Jogando agora'):h('button',{class:'g',style:'min-height:44px',onclick:()=>switchPlayer(p.id)},'Jogar'));});
+  return modal([h('h2',{},'👤 Quem vai jogar?'),h('p',{class:'small'},'Cada jogador tem o seu progresso, as suas moedas e as suas roupas do Zeca.'),...rows,h('div',{style:'margin-top:10px'},inp,h('button',{class:'g',style:'margin-left:8px',onclick:()=>newPlayer(inp.value)},'➕ Criar'))],'Fechar');}
+function screenWho(){running=false;const L=playersInfo();
+  stage.replaceChildren(h('h1',{style:'text-align:center'},'Quem vai jogar hoje? 👋'),
+    h('div',{class:'levels'},L.map(p=>{const th=h('div',{style:'line-height:0'});th.innerHTML=zecaSVG(p.outfit,'full',190);
+      return h('button',{class:'tile',style:'min-height:300px',onclick:()=>{SSN.set('zeca-chosen','1');if(p.id===IX.active)screenHome();else switchPlayer(p.id);}},th,h('b',{style:'font-size:24px'},p.name),h('small',{},`Nível ${p.lvl} · ⭐ ${p.stars}`));}),
+      h('button',{class:'tile',style:'min-height:300px',onclick:()=>{SSN.set('zeca-chosen','1');playerPicker();screenHome();}},h('span',{class:'e'},'➕'),'Novo jogador')));}
+function newPlayer(name){name=(name||'').trim().slice(0,14);if(!name){toast('Digite um apelido');return;}if(IX.ids.length>=8){toast('Máximo de 8 jogadores');return;}save();SSN.set('zeca-chosen','1');const id='p'+Date.now().toString(36);IX.ids.push(id);IX.active=id;wr(IDX,IX);wr(keyOf(id),Object.assign(defaults(),{id,name}));location.reload();}
 function screenPodium(){running=false;
   const L=allPlayers().sort((a,b)=>rankBy==='stars'?(b.stars-a.stars||b.earned-a.earned):(b.earned-a.earned||b.stars-a.stars));
   const val=p=>rankBy==='stars'?p.stars:p.earned,icon=rankBy==='stars'?'⭐':'🪙';
@@ -935,8 +1060,8 @@ function screenHome(){running=false;updHeader();
     h('div',{class:'grid'},
       h('button',{class:'tile',onclick:()=>screenLevels('add')},h('span',{class:'e'},'➕'),'Adição',h('small',{},'4 níveis · "vai-um"')),
       h('button',{class:'tile',onclick:()=>screenLevels('sub')},h('span',{class:'e'},'➖'),'Subtração',h('small',{},'4 níveis · "empréstimo"')),
-      h('button',{class:'tile',onclick:()=>screenLevels('mult')},h('span',{class:'e'},'✖️'),'Multiplicação',h('small',{},'4 níveis no caderno')),
-      h('button',{class:'tile',onclick:()=>screenLevels('div')},h('span',{class:'e'},'➗'),'Divisão',h('small',{},'exata e com resto · 4 níveis')),
+      h('button',{class:'tile',onclick:()=>screenHub('mult')},h('span',{class:'e'},'✖️'),'Multiplicação',h('small',{},'contas, dobro e triplo, problemas')),
+      h('button',{class:'tile',onclick:()=>screenHub('div')},h('span',{class:'e'},'➗'),'Divisão',h('small',{},'contas, metade e terço, quantas vezes cabe')),
       h('button',{class:'tile',onclick:screenTabuada},h('span',{class:'e'},'🎤'),'Tabuada',h('small',{},'aprender, relâmpago e prova oral')),
       h('button',{class:'tile',onclick:screenExams},h('span',{class:'e'},'📝'),'Simulados',h('small',{},'provas de treino')),
       h('button',{class:'tile',onclick:screenPodium},h('span',{class:'e'},'🏅'),'Pódio',h('small',{},'ranking e jogadores')),
@@ -945,8 +1070,9 @@ function screenHome(){running=false;updHeader();
 
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 try{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
-updHeader();screenHome();
-window.__t={buildMult,buildDiv,genMult,genDiv,buildAdd,buildSub,genAdd,genSub,genSum,makeExercise,ptNum,S:()=>S};
+updHeader();
+if(IX.ids.length>1&&!SSN.get('zeca-chosen'))screenWho();else screenHome();
+window.__t={makeExercise,makeProblem,genMF,genDF,genDQ,genPM1,genPM2,buildMult,buildDiv,genMult,genDiv,buildAdd,buildSub,genAdd,genSub,genSum,makeExercise,ptNum,S:()=>S};
 </script>
 </body>
 </html>

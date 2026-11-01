@@ -1,6 +1,6 @@
 /* Service worker do Zeca — guarda o jogo no aparelho para funcionar sem internet.
    Ao publicar uma nova versão do jogo, troque o número em CACHE (ex.: zeca-v2). */
-const CACHE = 'zeca-v2';
+const CACHE = 'zeca-v3';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
